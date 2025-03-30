@@ -6,22 +6,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestJoker(t *testing.T) {
-	d := []Card{}
-	d = append(d, initialDeck...)
-	deck := Deck{}
-	// Initialize the deck with the initial order
-	for i := 0; i < len(d); i++ {
-		deck.order[i] = d[i]
-	}
-	assert.Equal(t, 52, deck.FindJokerA(), "Joker A should be at position 52")
-	assert.Equal(t, 53, deck.FindJokerB(), "Joker B should be at position 53")
-}
-
 func TestMove(t *testing.T) {
 	d := Deck{}
 	// Initialize the deck with the initial order
-	copy(d.order[:], initialDeck)
+	copy(d[:], initialDeck)
 	jokerA := d.FindJokerA()
 	assert.Equal(t, 52, jokerA, "Joker A should be at position 52")
 	jokerB := d.FindJokerB()
@@ -38,7 +26,15 @@ func TestMove(t *testing.T) {
 	assert.Equal(t, 53, jokerAafterRound2, "Joker A should be at position 52 after round 2")
 	jokerBafterRound2 := d.FindJokerB()
 	assert.Equal(t, 1, jokerBafterRound2, "Joker B should be at position 1 after round 2")
-	assert.Equal(t, 1, d.order[0].Value())
-	assert.Equal(t, clubs, d.order[0].color)
-	assert.Equal(t, 1, int(d.order[0].card))
+	assert.Equal(t, 1, d[0].Value())
+	assert.Equal(t, clubs, d[0].color)
+	assert.Equal(t, 1, int(d[0].card))
+}
+
+func TestMoveIntNew(t *testing.T) {
+	var c [54]Card
+	copy(c[:], initialDeck)
+	moved := moveIntNew(c, 0, 1)
+	assert.NotNil(t, moved, "Moved card should not be nil")
+	//
 }
