@@ -54,13 +54,12 @@ func (d *Deck) find(card Card) int {
 	}
 	return -1
 }
-func (d *Deck) FindBlackJoker() int {
+func (d *Deck) FindJokerB() int {
 	// Find the index of the black joker in the deck.
 	return d.find(Card{color: jokers, card: jokerB})
 }
 
-func (d *Deck) FindRedJoker() int {
-	// Find the index of the red joker in the deck.
+func (d *Deck) FindJokerA() int {
 	return d.find(Card{color: jokers, card: jokerA})
 }
 

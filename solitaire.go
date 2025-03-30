@@ -20,9 +20,9 @@ func WithPassphrase(passphrase string) SolitaireOption {
 		// Set the position to 0
 		s.deck.SetPosition(0)
 		for _, c := range []byte(passphrase) {
-			s.deck.SetPosition(s.deck.FindRedJoker())
+			s.deck.SetPosition(s.deck.FindJokerA())
 			s.deck.MoveCurrent(1)
-			s.deck.SetPosition(s.deck.FindBlackJoker())
+			s.deck.SetPosition(s.deck.FindJokerB())
 			s.deck.MoveCurrent(2)
 			s.deck.TripleCut()
 			s.deck.CountCut()
@@ -108,9 +108,9 @@ func (s *solitaire) generateKeyStream(length int) []int {
 	// Generate the keystream by moving the jokers and cutting the deck.
 	keys := make([]int, 0)
 	for i := 0; len(keys) < length; i++ {
-		s.deck.SetPosition(s.deck.FindRedJoker())
+		s.deck.SetPosition(s.deck.FindJokerA())
 		s.deck.MoveCurrent(1)
-		s.deck.SetPosition(s.deck.FindBlackJoker())
+		s.deck.SetPosition(s.deck.FindJokerB())
 		s.deck.MoveCurrent(2)
 		s.deck.TripleCut()
 		s.deck.CountCut()
