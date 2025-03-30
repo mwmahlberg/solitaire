@@ -18,14 +18,8 @@ func WithPassphrase(passphrase string) SolitaireOption {
 		copy(s.deck.order[:], initialDeck)
 
 		// Set the position to 0
-		s.deck.SetPosition(0)
 		for _, c := range []byte(passphrase) {
-			s.deck.SetPosition(s.deck.FindJokerA())
-			s.deck.MoveCurrent(1)
-			s.deck.SetPosition(s.deck.FindJokerB())
-			s.deck.MoveCurrent(2)
-			s.deck.TripleCut()
-			s.deck.CountCut()
+			s.deck.Advance()
 			s.deck.countCut(findCharIndex(c) + 1)
 		}
 		return nil
@@ -108,12 +102,7 @@ func (s *solitaire) generateKeyStream(length int) []int {
 	// Generate the keystream by moving the jokers and cutting the deck.
 	keys := make([]int, 0)
 	for i := 0; len(keys) < length; i++ {
-		s.deck.SetPosition(s.deck.FindJokerA())
-		s.deck.MoveCurrent(1)
-		s.deck.SetPosition(s.deck.FindJokerB())
-		s.deck.MoveCurrent(2)
-		s.deck.TripleCut()
-		s.deck.CountCut()
+		s.deck.Advance()
 		val := s.deck.order[s.deck.order[0].Value()].Value()
 		if val == 53 {
 			// Skip the joker

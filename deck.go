@@ -6,6 +6,26 @@ type Deck struct {
 	Value    *Card
 }
 
+func (d *Deck) Advance() {
+	// Move the current position to the next card in the deck.
+	a := d.FindJokerA()
+	d.Move(a, 1)
+	b := d.FindJokerB()
+	d.Move(b, 2)
+	d.TripleCut()
+	d.CountCut()
+}
+
+func (d *Deck) Move(pos, by int) {
+	// Move the card at the specified position by the specified number of positions
+	// in the deck.
+	offset := by
+	if pos+by >= len(d.order) {
+		offset = by + 1
+	}
+	copy(d.order[:], moveInt(d.order[:], pos, (pos+offset)%len(d.order)))
+}
+
 func (d *Deck) MoveCurrent(by int) {
 	// Move the card at the current position by the specified number of positions
 	// in the deck. If by is negative, move the card to the left; if by is positive, move it to the right.

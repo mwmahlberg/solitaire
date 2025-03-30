@@ -6,35 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMove(t *testing.T) {
-	d := []Card{}
-	d = append(d, initialDeck...)
-	deck := Deck{}
-	// Initialize the deck with the initial order
-	for i := 0; i < len(d); i++ {
-		deck.order[i] = d[i]
-	}
-
-	assert.Equal(t, 0, deck.Position(), "Initial position should be 0")
-	deck.Next()
-	assert.Equal(t, 1, deck.Position(), "Position should be 1 after moving next")
-	deck.Previous()
-	assert.Equal(t, 0, deck.Position(), "Position should be 0 after moving previous")
-	deck.Previous()
-	assert.Equal(t, 53, deck.Position(), "Position should wrap around to 53 after moving previous")
-	assert.Equal(t, deck.Value, &Card{color: jokers, card: jokerB}, "Current card should be the last card in the deck")
-	deck.MoveCurrent(-10)
-	deck.SetPosition(43)
-	assert.Equal(t, 43, deck.Position(), "Position should be set to 43")
-	assert.Equal(t, deck.Value, &Card{color: jokers, card: jokerB}, "Current card should be the the the joker")
-	deck.MoveCurrent(15)
-	assert.Equal(t, deck.Position(), 43, "Position should be 43 after moving current")
-	assert.NotEqual(t, deck.Value, &Card{color: jokers, card: jokerB}, "Current card should not be the joker")
-	deck.SetPosition(4)
-	assert.Equal(t, deck.Position(), 4, "Position should be set to 4")
-	assert.Equal(t, &Card{color: jokers, card: jokerB}, deck.Value, "Current card should be the joker")
-}
-
 func TestJoker(t *testing.T) {
 	d := []Card{}
 	d = append(d, initialDeck...)
@@ -45,4 +16,29 @@ func TestJoker(t *testing.T) {
 	}
 	assert.Equal(t, 52, deck.FindJokerA(), "Joker A should be at position 52")
 	assert.Equal(t, 53, deck.FindJokerB(), "Joker B should be at position 53")
+}
+
+func TestMove(t *testing.T) {
+	d := Deck{}
+	// Initialize the deck with the initial order
+	copy(d.order[:], initialDeck)
+	jokerA := d.FindJokerA()
+	assert.Equal(t, 52, jokerA, "Joker A should be at position 52")
+	jokerB := d.FindJokerB()
+	assert.Equal(t, 53, jokerB, "Joker B should be at position 53")
+
+	d.Move(jokerA, 1)
+	jokerAafterRound1 := d.FindJokerA()
+	assert.Equal(t, 53, jokerAafterRound1, "Joker A should be at position 53 after round 1")
+	jokerBafterRound1 := d.FindJokerB()
+	assert.Equal(t, 52, jokerBafterRound1, "Joker B should be at position 52 after round 1")
+
+	d.Move(jokerBafterRound1, 2)
+	jokerAafterRound2 := d.FindJokerA()
+	assert.Equal(t, 53, jokerAafterRound2, "Joker A should be at position 52 after round 2")
+	jokerBafterRound2 := d.FindJokerB()
+	assert.Equal(t, 1, jokerBafterRound2, "Joker B should be at position 1 after round 2")
+	assert.Equal(t, 1, d.order[0].Value())
+	assert.Equal(t, clubs, d.order[0].color)
+	assert.Equal(t, 1, int(d.order[0].card))
 }
