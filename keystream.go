@@ -21,13 +21,13 @@ const (
 	jokerB card = 54
 )
 
-var matrix = []byte{
+var alphabet = []byte{
 	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
 	'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
 	'U', 'V', 'W', 'X', 'Y', 'Z'}
 
 func findCharIndex(b byte) int {
-	for i, c := range matrix {
+	for i, c := range alphabet {
 		if b == c {
 			return i
 		}
@@ -40,7 +40,7 @@ func findCharByIndex(i int) byte {
 	if i == 0 {
 		i = 26
 	}
-	return matrix[i-1]
+	return alphabet[i-1]
 }
 
 type color int

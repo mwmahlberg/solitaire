@@ -57,7 +57,7 @@ func (s *solitaire) Encrypt(plaintext []byte) ([]byte, error) {
 	for i, c := range normalized {
 		n := findCharIndex(c)
 		key := keys[i]
-		idx := (n + key + 1) % len(matrix)
+		idx := (n + key + 1) % len(alphabet)
 		ct[i] = findCharByIndex(idx)
 	}
 
@@ -95,9 +95,9 @@ func (s *solitaire) Decrypt(ciphertext []byte) ([]byte, error) {
 	for i, c := range normalized {
 		n := findCharIndex(c)
 		key := keys[i]
-		idx := (n - key + 1) % len(matrix)
+		idx := (n - key + 1) % len(alphabet)
 		if idx < 0 {
-			idx += len(matrix)
+			idx += len(alphabet)
 		}
 		ct[i] = findCharByIndex(idx)
 	}
