@@ -3,7 +3,6 @@ package solitaire
 import (
 	"testing"
 
-	"github.com/awnumar/memguard"
 	"github.com/stretchr/testify/assert"
 )
 
