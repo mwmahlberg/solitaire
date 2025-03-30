@@ -2,6 +2,8 @@ package solitaire
 
 import (
 	"fmt"
+
+	"github.com/awnumar/memguard"
 )
 
 type card int
@@ -25,8 +27,8 @@ const (
 	queen
 	king
 	ace
-	redJokerCard   card = 53
-	blackJokerCard card = 54
+	jokerA card = 53
+	jokerB card = 54
 )
 
 var matrix = []byte{
@@ -154,8 +156,8 @@ var initialDeck = []Card{
 	{color: spades, card: jack},
 	{color: spades, card: queen},
 	{color: spades, card: king},
-	{color: jokers, card: redJokerCard},
-	{color: jokers, card: blackJokerCard},
+	{color: jokers, card: jokerA},
+	{color: jokers, card: jokerB},
 }
 
 func setUp(passphrase string) {
@@ -225,6 +227,17 @@ func setUp(passphrase string) {
 	// Print the ciphertext
 	txt := fmt.Sprintf("Ciphertext:\t%s\n", string(ct))
 	fmt.Println(txt)
+
+}
+
+func setupWithEnclave(e *memguard.Enclave) {
+	l, err := e.Open()
+	if err != nil {
+		panic(err)
+	}
+	defer l.Destroy()
+
+	trueSetup(l.String())
 
 }
 

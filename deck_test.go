@@ -3,6 +3,7 @@ package solitaire
 import (
 	"testing"
 
+	"github.com/awnumar/memguard"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,17 +23,17 @@ func TestMove(t *testing.T) {
 	assert.Equal(t, 0, deck.Position(), "Position should be 0 after moving previous")
 	deck.Previous()
 	assert.Equal(t, 53, deck.Position(), "Position should wrap around to 53 after moving previous")
-	assert.Equal(t, deck.Value, &Card{color: jokers, card: blackJokerCard}, "Current card should be the last card in the deck")
+	assert.Equal(t, deck.Value, &Card{color: jokers, card: jokerB}, "Current card should be the last card in the deck")
 	deck.MoveCurrent(-10)
 	deck.SetPosition(43)
 	assert.Equal(t, 43, deck.Position(), "Position should be set to 43")
-	assert.Equal(t, deck.Value, &Card{color: jokers, card: blackJokerCard}, "Current card should be the the the joker")
+	assert.Equal(t, deck.Value, &Card{color: jokers, card: jokerB}, "Current card should be the the the joker")
 	deck.MoveCurrent(15)
 	assert.Equal(t, deck.Position(), 43, "Position should be 43 after moving current")
-	assert.NotEqual(t, deck.Value, &Card{color: jokers, card: blackJokerCard}, "Current card should not be the joker")
+	assert.NotEqual(t, deck.Value, &Card{color: jokers, card: jokerB}, "Current card should not be the joker")
 	deck.SetPosition(4)
 	assert.Equal(t, deck.Position(), 4, "Position should be set to 4")
-	assert.Equal(t, &Card{color: jokers, card: blackJokerCard}, deck.Value, "Current card should be the joker")
+	assert.Equal(t, &Card{color: jokers, card: jokerB}, deck.Value, "Current card should be the joker")
 }
 
 func TestJoker(t *testing.T) {
@@ -53,4 +54,10 @@ func TestSetup(t *testing.T) {
 
 func TestTrueSetup(t *testing.T) {
 	trueSetup("CRYPTONOMICON")
+}
+
+func TestSetupWithEnclave(t *testing.T) {
+	defer memguard.Purge()
+	key := memguard.NewEnclave([]byte("CRYPTONOMICON"))
+	setupWithEnclave(key)
 }
