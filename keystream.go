@@ -1,14 +1,6 @@
 package solitaire
 
-import (
-	"fmt"
-)
-
 type card int
-type joker int
-type jokerPosition int
-
-// type jokerColor int
 
 const (
 	one card = iota + 1
@@ -25,17 +17,17 @@ const (
 	queen
 	king
 	ace
-	redJokerCard   card = 53
-	blackJokerCard card = 54
+	jokerA card = 53
+	jokerB card = 54
 )
 
-var matrix = []byte{
+var alphabet = [26]byte{
 	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
 	'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
 	'U', 'V', 'W', 'X', 'Y', 'Z'}
 
 func findCharIndex(b byte) int {
-	for i, c := range matrix {
+	for i, c := range alphabet {
 		if b == c {
 			return i
 		}
@@ -48,7 +40,7 @@ func findCharByIndex(i int) byte {
 	if i == 0 {
 		i = 26
 	}
-	return matrix[i-1]
+	return alphabet[i-1]
 }
 
 type color int
@@ -154,123 +146,6 @@ var initialDeck = []Card{
 	{color: spades, card: jack},
 	{color: spades, card: queen},
 	{color: spades, card: king},
-	{color: jokers, card: redJokerCard},
-	{color: jokers, card: blackJokerCard},
-}
-
-func setUp(passphrase string) {
-	deck := Deck{}
-	// Initialize the deck with the initial order
-	for i := 0; i < len(initialDeck); i++ {
-		deck.order[i] = initialDeck[i]
-	}
-	// // Set the position to the first card
-	// deck.SetPosition(deck.FindRedJoker())
-	// deck.MoveCurrent(1)
-	// for n, p := range deck.order {
-	// 	fmt.Printf("%d: %s%d\n", n, p.color.String(), p.Value())
-	// }
-	// bj := deck.FindBlackJoker()
-	// fmt.Printf("Black joker is at %d\n", bj)
-	// deck.SetPosition(bj)
-	// // skip two cards
-	// deck.MoveCurrent(2)
-	// for n, p := range deck.order {
-	// 	fmt.Printf("%d: %s%d\n", n, p.color.String(), p.Value())
-	// }
-	// deck.TripleCut()
-	// deck.CountCut()
-	// val := deck.order[deck.order[0].Value()].Value()
-	// fmt.Printf("Value of the card at position %d is %d\n", deck.order[0].Value(), val)
-
-	// deck.SetPosition(deck.FindRedJoker())
-	// deck.MoveCurrent(1)
-	// deck.SetPosition(deck.FindBlackJoker())
-	// deck.MoveCurrent(2)
-	// deck.TripleCut()
-	// deck.CountCut()
-	// val = deck.order[deck.order[0].Value()].Value()
-	// fmt.Printf("Value of the card at position %d is %d\n", deck.order[0].Value(), val)
-
-	plaintext := []byte("AAAAAAAAAA")
-	// Normalize the plaintext by removing non-alphabetic characters
-	// and converting to uppercase.
-	normalized := normalizeCleartext(plaintext)
-	keys := make([]int, 0)
-
-	for i := 0; len(keys) < len(normalized); i++ {
-		deck.SetPosition(deck.FindRedJoker())
-		deck.MoveCurrent(1)
-		deck.SetPosition(deck.FindBlackJoker())
-		deck.MoveCurrent(2)
-		deck.TripleCut()
-		deck.CountCut()
-		val := deck.order[deck.order[0].Value()].Value()
-		if val == 53 {
-			// Skip the joker
-			continue
-		}
-		keys = append(keys, val)
-	}
-	ct := make([]byte, len(normalized))
-	// Print the keys
-	for i, c := range normalized {
-		n := findCharIndex(c)
-		key := keys[i]
-		idx := (n + key + 1)
-		ct[i] = findCharByIndex(idx)
-	}
-
-	fmt.Printf("Cleartext:\t%s\n", string(normalized))
-	// Print the ciphertext
-	txt := fmt.Sprintf("Ciphertext:\t%s\n", string(ct))
-	fmt.Println(txt)
-
-}
-
-func trueSetup(passphrase string) {
-	// Initialize the deck with the initial order
-	deck := Deck{}
-	copy(deck.order[:], initialDeck)
-
-	for _, c := range []byte(passphrase) {
-		deck.SetPosition(deck.FindRedJoker())
-		deck.MoveCurrent(1)
-		deck.SetPosition(deck.FindBlackJoker())
-		deck.MoveCurrent(2)
-		deck.TripleCut()
-		deck.CountCut()
-		deck.countCut(findCharIndex(c) + 1)
-	}
-
-	clear := []byte("SOLITAIRE")
-	normalized := normalizeCleartext(padClearText(clear))
-	keys := make([]int, 0)
-	for i := 0; len(keys) < len(normalized); i++ {
-		deck.SetPosition(deck.FindRedJoker())
-		deck.MoveCurrent(1)
-		deck.SetPosition(deck.FindBlackJoker())
-		deck.MoveCurrent(2)
-		deck.TripleCut()
-		deck.CountCut()
-		val := deck.order[deck.order[0].Value()].Value()
-		if val == 53 {
-			// Skip the joker
-			continue
-		}
-		keys = append(keys, val)
-	}
-
-	ct := make([]byte, len(normalized))
-	// Print the keys
-	for i, c := range normalized {
-		n := findCharIndex(c)
-		key := keys[i]
-		idx := (n + key + 1)
-		ct[i] = findCharByIndex(idx)
-	}
-
-	// Print the ciphertext
-	fmt.Printf("Ciphertext: ")
-	printCipherText(ct)
+	{color: jokers, card: jokerA},
+	{color: jokers, card: jokerB},
 }
