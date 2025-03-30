@@ -43,6 +43,6 @@ func TestJoker(t *testing.T) {
 	for i := 0; i < len(d); i++ {
 		deck.order[i] = d[i]
 	}
-	assert.Equal(t, 52, deck.FindRedJoker(), "Red joker should be at position 52")
-	assert.Equal(t, 53, deck.FindBlackJoker(), "Black joker should be at position 53")
+	assert.Equal(t, 52, deck.FindJokerA(), "Joker A should be at position 52")
+	assert.Equal(t, 53, deck.FindJokerB(), "Joker B should be at position 53")
 }
