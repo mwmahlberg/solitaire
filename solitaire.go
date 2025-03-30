@@ -15,7 +15,7 @@ func WithPassphrase(passphrase string) SolitaireOption {
 		// 	return fmt.Errorf("passphrase cannot be empty")
 		// }
 		s.deck = &Deck{}
-		copy(s.deck.order[:], initialDeck)
+		copy(s.deck[:], initialDeck)
 
 		// Set the position to 0
 		for _, c := range []byte(passphrase) {
@@ -103,7 +103,7 @@ func (s *solitaire) generateKeyStream(length int) []int {
 	keys := make([]int, 0)
 	for i := 0; len(keys) < length; i++ {
 		s.deck.Advance()
-		val := s.deck.order[s.deck.order[0].Value()].Value()
+		val := s.deck[s.deck[0].Value()].Value()
 		if val == 53 {
 			// Skip the joker
 			continue
