@@ -20,11 +20,6 @@ var mappings = map[byte][]byte{
 
 func normalizeCleartext(plaintext []byte) []byte {
 
-	if len(plaintext) == 0 || len(plaintext)%5 != 0 {
-		// If the plaintext is empty or not a multiple of 5, PANIC!
-		panic("plaintext must be a non-empty multiple of 5")
-	}
-
 	// Normalize the plaintext by removing non-alphabetic characters
 	// and converting to uppercase.
 	normalized := make([]byte, 0, len(plaintext))

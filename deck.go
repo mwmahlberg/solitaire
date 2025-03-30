@@ -19,7 +19,7 @@ func (d *Deck) Move(pos, by int) {
 	if pos+by >= len(d) {
 		offset = by + 1
 	}
-	*d = moveIntNew([54]Card(*d), pos, (pos+offset)%len(d))
+	d.moveCard(pos, (pos+offset)%len(d))
 }
 
 func (d *Deck) find(card Card) int {
@@ -95,42 +95,22 @@ func (d *Deck) countCut(cut int) {
 	copy(d[:], newOrder)
 }
 
-func Abs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
-
-func insertInt(array []Card, value Card, index int) []Card {
-	return append(array[:index], append([]Card{value}, array[index:]...)...)
-}
-
-func removeInt(array []Card, index int) []Card {
-	return append(array[:index], array[index+1:]...)
-}
-
-func moveInt(array []Card, srcIndex int, dstIndex int) []Card {
-	value := array[srcIndex]
-	return insertInt(removeInt(array, srcIndex), value, dstIndex)
-}
-
-func insertIntNew(array [54]Card, value Card, index int) [54]Card {
+func (d *Deck) InsertCard(value Card, index int) {
 	var n [54]Card
-	copy(n[:], array[:index])
+	copy(n[:], d[:index])
 	copy(n[index:], []Card{value})
-	copy(n[index+1:], array[index:])
-	return n
+	copy(n[index+1:], d[index:])
+	copy(d[:], n[:])
 }
 
-func removeIntNew(array [54]Card, index int) [54]Card {
-	var n [54]Card
-	copy(n[:], array[:index])
-	copy(n[index:], array[index+1:])
-	return n
+func (d *Deck) RemoveCard(index int) {
+	copy(d[:], d[:index])
+	copy(d[index:], d[index+1:])
 }
-func moveIntNew(array [54]Card, srcIndex int, dstIndex int) [54]Card {
-	value := array[srcIndex]
-	n := removeIntNew(array, srcIndex)
-	return insertIntNew(n, value, dstIndex)
+
+func (d *Deck) moveCard(srcIndex int, dstIndex int) {
+	value := d[srcIndex]
+	// Remove the card from the source index
+	d.RemoveCard(srcIndex)
+	d.InsertCard(value, dstIndex)
 }

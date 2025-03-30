@@ -76,17 +76,16 @@ func (s *solitaire) Encrypt(plaintext []byte) ([]byte, error) {
 
 func (s *solitaire) Decrypt(ciphertext []byte) ([]byte, error) {
 	// Normalize the ciphertext by removing spaces and converting to uppercase.
-	normalized := normalizeCleartext(ciphertext)
-	if len(normalized) == 0 || len(normalized)%5 != 0 {
+	if len(ciphertext) == 0 || len(ciphertext)%5 != 0 {
 		// If the ciphertext is empty or not a multiple of 5, PANIC!
 		panic("ciphertext must be a non-empty multiple of 5")
 	}
 	// Generate the keystream
-	keys := s.generateKeyStream(len(normalized))
+	keys := s.generateKeyStream(len(ciphertext))
 
 	// Decrypt the ciphertext using the keystream.
-	ct := make([]byte, len(normalized))
-	for i, c := range normalized {
+	ct := make([]byte, len(ciphertext))
+	for i, c := range ciphertext {
 		n := findCharIndex(c)
 		key := keys[i]
 		idx := (n - key + 1) % len(alphabet)
