@@ -9,7 +9,7 @@ type solitaire struct {
 
 type SolitaireOption func(*solitaire) error
 
-func WithPassphrase(passphrase string) SolitaireOption {
+func WithPassphrase(passphrase []byte) SolitaireOption {
 	return func(s *solitaire) error {
 		// if passphrase == "" {
 		// 	return fmt.Errorf("passphrase cannot be empty")
@@ -18,7 +18,7 @@ func WithPassphrase(passphrase string) SolitaireOption {
 		copy(s.deck[:], initialDeck)
 
 		// Set the position to 0
-		for _, c := range []byte(passphrase) {
+		for _, c := range passphrase {
 			s.deck.Advance()
 			s.deck.countCut(findCharIndex(c) + 1)
 		}
