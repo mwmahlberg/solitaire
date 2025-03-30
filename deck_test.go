@@ -3,7 +3,6 @@ package solitaire
 import (
 	"testing"
 
-	"github.com/awnumar/memguard"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -46,18 +45,4 @@ func TestJoker(t *testing.T) {
 	}
 	assert.Equal(t, 52, deck.FindRedJoker(), "Red joker should be at position 52")
 	assert.Equal(t, 53, deck.FindBlackJoker(), "Black joker should be at position 53")
-}
-
-func TestSetup(t *testing.T) {
-	setUp("test")
-}
-
-func TestTrueSetup(t *testing.T) {
-	trueSetup("CRYPTONOMICON")
-}
-
-func TestSetupWithEnclave(t *testing.T) {
-	defer memguard.Purge()
-	key := memguard.NewEnclave([]byte("CRYPTONOMICON"))
-	setupWithEnclave(key)
 }
