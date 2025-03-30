@@ -37,7 +37,7 @@ func TestEncryption(t *testing.T) {
 	}
 	for _, tC := range testCases {
 		t.Run(fmt.Sprintf("%s(%s)->%s", tC.passphrase, tC.cleartext, tC.ciphertext), func(t *testing.T) {
-			s, err := solitaire.New(solitaire.WithPassphrase(tC.passphrase))
+			s, err := solitaire.New(solitaire.WithPassphrase([]byte(tC.passphrase)))
 			assert.NoError(t, err, "Failed to create new solitaire instance")
 			assert.NotNil(t, s, "Solitaire instance should not be nil")
 			ct, err := s.Encrypt([]byte(tC.cleartext))
@@ -67,7 +67,7 @@ func TestDecryption(t *testing.T) {
 	}
 	for _, tC := range testCases {
 		t.Run(fmt.Sprintf("%s(%s)->%s", tC.passphrase, tC.cleartext, tC.ciphertext), func(t *testing.T) {
-			s, err := solitaire.New(solitaire.WithPassphrase(tC.passphrase))
+			s, err := solitaire.New(solitaire.WithPassphrase([]byte(tC.passphrase)))
 			assert.NoError(t, err, "Failed to create new solitaire instance")
 			assert.NotNil(t, s, "Solitaire instance should not be nil")
 			clear, err := s.Decrypt([]byte(tC.ciphertext))
@@ -79,7 +79,7 @@ func TestDecryption(t *testing.T) {
 }
 
 func TestSolitaire(t *testing.T) {
-	s, err := solitaire.New(solitaire.WithPassphrase("CRYPTONOMICON"))
+	s, err := solitaire.New(solitaire.WithPassphrase([]byte("CRYPTONOMICON")))
 	assert.NoError(t, err, "Failed to create new solitaire instance")
 	assert.NotNil(t, s, "Solitaire instance should not be nil")
 	ct, err := s.Encrypt([]byte("SOLITAIRE"))
