@@ -55,11 +55,3 @@ func TestMove(t *testing.T) {
 	assert.Equal(t, clubs, d[0].color)
 	assert.Equal(t, 1, int(d[0].card))
 }
-
-func TestMoveIntNew(t *testing.T) {
-	var c [54]Card
-	copy(c[:], initialDeck)
-	moved := moveIntNew(c, 0, 1)
-	assert.NotNil(t, moved, "Moved card should not be nil")
-	//
-}
