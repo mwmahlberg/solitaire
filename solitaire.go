@@ -1,6 +1,10 @@
 package solitaire
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/awnumar/memguard"
+)
 
 type solitaire struct {
 	// The deck of cards used in the Solitaire encryption algorithm.
@@ -11,9 +15,7 @@ type SolitaireOption func(*solitaire) error
 
 func WithPassphrase(passphrase []byte) SolitaireOption {
 	return func(s *solitaire) error {
-		// if passphrase == "" {
-		// 	return fmt.Errorf("passphrase cannot be empty")
-		// }
+
 		s.deck = &Deck{}
 		copy(s.deck[:], initialDeck)
 
@@ -23,6 +25,30 @@ func WithPassphrase(passphrase []byte) SolitaireOption {
 			s.deck.countCut(findCharIndex(c) + 1)
 		}
 		return nil
+	}
+}
+
+func WithPassphraseFromLockedBuffer(buf *memguard.LockedBuffer) SolitaireOption {
+	return func(s *solitaire) error {
+		if buf == nil {
+			return fmt.Errorf("passphrase is required")
+		}
+
+		return WithPassphrase(buf.Bytes())(s)
+	}
+}
+
+func WithPassphraseFromEnclave(passphrase *memguard.Enclave) SolitaireOption {
+	return func(s *solitaire) error {
+		if passphrase == nil {
+			return fmt.Errorf("passphrase is required")
+		}
+		buf, err := passphrase.Open()
+		if err != nil {
+			return err
+		}
+		defer buf.Destroy()
+		return WithPassphraseFromLockedBuffer(buf)(s)
 	}
 }
 
