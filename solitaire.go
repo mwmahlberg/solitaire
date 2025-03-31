@@ -65,6 +65,13 @@ func New(opts ...SolitaireOption) (*solitaire, error) {
 	return s, nil
 }
 
+func (s *solitaire) Deck() []Card {
+	// Return a copy of the deck
+	d := make([]Card, len(s.deck))
+	copy(d, s.deck[:])
+	return d
+}
+
 func (s *solitaire) Encrypt(plaintext []byte) ([]byte, error) {
 	// Normalize the plaintext by removing spaces and converting to uppercase.
 	normalized := normalizeCleartext(padClearText(plaintext))
