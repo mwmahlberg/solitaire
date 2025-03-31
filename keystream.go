@@ -53,6 +53,9 @@ func (r *rank) Short() string {
 }
 
 const (
+	// TODO: Make this zero-based
+	// While it is more intuitive to have the first card be 1, it is not
+	// necessary for the algorithm.
 	ace rank = iota + 1
 	two
 	three
@@ -151,8 +154,8 @@ func (c Card) Suit() suit {
 	return c.suit
 }
 
-func (c Card) Rank() int {
-	return int(c.rank)
+func (c Card) Rank() rank {
+	return c.rank
 }
 
 func (c Card) Value() int {
@@ -169,16 +172,8 @@ func (c Card) String() string {
 	if c.rank == jokerB {
 		return "Joker B"
 	}
-	var name string = fmt.Sprintf("%d", c.rank)
-	switch c.rank {
-	case king:
-		name = "K"
-	case queen:
-		name = "Q"
-	case jack:
-		name = "J"
-	}
-	return fmt.Sprintf("%s %s", c.suit.String(), name)
+
+	return fmt.Sprintf("%s %s", c.suit.String(), c.rank.Short())
 }
 
 var initialDeck = []Card{
