@@ -13,6 +13,13 @@ type solitaire struct {
 
 type SolitaireOption func(*solitaire) error
 
+// WithPassphrase takes a passphrase and sets the deck.
+// It is the caller's responsibility to ensure that the passphrase is valid.
+// If the passphrase is nil, it returns an error. However, the passphrase may be empty.
+// In this case, the deck will be set to the initial deck:
+// ace to king of clubs, diamonds, hearts, and spades, followed by the two jokers.
+// It is the caller's responsibility to ensure that a proper passphrase is used
+// in the appropriate context.
 func WithPassphrase(passphrase []byte) SolitaireOption {
 	return func(s *solitaire) error {
 
@@ -28,6 +35,12 @@ func WithPassphrase(passphrase []byte) SolitaireOption {
 	}
 }
 
+// WithPassphraseFromLockedBuffer takes a passphrase from a memguard.LockedBuffer and sets the deck.
+// It is a convenience function for use with the memguard package.
+// If the passphrase is nil, it returns an error.
+// If the memguard.LockedBuffer is not Alive, WithPassphraseFromLockedBuffer will panic.
+// It is the caller's responsibility to ensure that the buf is valid and not empty.
+// The passphrase stored within the memguard.LockedBuffer is used to set the deck.
 func WithPassphraseFromLockedBuffer(buf *memguard.LockedBuffer) SolitaireOption {
 	return func(s *solitaire) error {
 		if buf == nil {
@@ -38,6 +51,13 @@ func WithPassphraseFromLockedBuffer(buf *memguard.LockedBuffer) SolitaireOption 
 	}
 }
 
+// WithPassphraseFromEnclave takes a passphrase from a memguard.Enclave and sets the deck.
+// It is a convenience function for use with the memguard package.
+// if the passphrase is nil, it returns an error.
+// If the memguard.Enclave cannot be opened, WithPassphraseFromLockedBuffer will panic.
+// It is the caller's responsibility to ensure that the passphrase is valid and not empty.
+// The passphrase stored within the memguard.LockedBuffer stored in the enclave
+// is used to set the deck.
 func WithPassphraseFromEnclave(passphrase *memguard.Enclave) SolitaireOption {
 	return func(s *solitaire) error {
 		if passphrase == nil {
@@ -45,7 +65,7 @@ func WithPassphraseFromEnclave(passphrase *memguard.Enclave) SolitaireOption {
 		}
 		buf, err := passphrase.Open()
 		if err != nil {
-			return err
+			memguard.SafePanic(err)
 		}
 		defer buf.Destroy()
 		return WithPassphraseFromLockedBuffer(buf)(s)
