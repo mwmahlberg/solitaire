@@ -33,17 +33,17 @@ func (d *Deck) find(card Card) int {
 }
 func (d *Deck) FindJokerB() int {
 	// Find the index of the black joker in the deck.
-	return d.find(Card{color: Jokers, card: JokerB})
+	return d.find(Card{suit: Jokers, card: jokerB})
 }
 
 func (d *Deck) FindJokerA() int {
-	return d.find(Card{color: Jokers, card: JokerA})
+	return d.find(Card{suit: Jokers, card: jokerA})
 }
 
 func (d *Deck) FindFirstJoker() int {
 	// Find the index of the first joker in the deck.
 	for i, c := range d {
-		if c.color == Jokers {
+		if c.suit == Jokers {
 			return i
 		}
 	}
@@ -52,7 +52,7 @@ func (d *Deck) FindFirstJoker() int {
 func (d *Deck) FindLastJoker() int {
 	// Find the index of the last joker in the deck.
 	for i := len(d) - 1; i >= 0; i-- {
-		if d[i].color == Jokers {
+		if d[i].suit == Jokers {
 			return i
 		}
 	}

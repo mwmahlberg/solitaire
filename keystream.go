@@ -19,8 +19,8 @@ const (
 	queen
 	king
 
-	JokerA card = 53
-	JokerB card = 54
+	jokerA card = 53
+	jokerB card = 54
 )
 
 var alphabet = [26]byte{
@@ -45,17 +45,17 @@ func findCharByIndex(i int) byte {
 	return alphabet[i-1]
 }
 
-type color int
+type suit int
 
 const (
-	Clubs    color = 0
-	Diamonds color = 13
-	Hearts   color = 26
-	Spades   color = 39
-	Jokers   color = 52
+	Clubs    suit = 0
+	Diamonds suit = 13
+	Hearts   suit = 26
+	Spades   suit = 39
+	Jokers   suit = 52
 )
 
-func (c color) String() string {
+func (c suit) String() string {
 	switch c {
 	case Clubs:
 		return "♣"
@@ -72,7 +72,7 @@ func (c color) String() string {
 	}
 }
 
-func (c color) Value(card int) int {
+func (c suit) Value(card int) int {
 	if card < 1 || card > 13 {
 		panic("card must be between 1 and 13")
 	}
@@ -83,20 +83,20 @@ func (c color) Value(card int) int {
 }
 
 type Card struct {
-	color color
-	card  card
+	suit suit
+	card card
 }
 
 func (c Card) IsJokerA() bool {
-	return c.card == JokerA
+	return c.card == jokerA
 }
 
 func (c Card) IsJokerB() bool {
-	return c.card == JokerB
+	return c.card == jokerB
 }
 
-func (c Card) Color() color {
-	return c.color
+func (c Card) Suit() suit {
+	return c.suit
 }
 
 func (c Card) Face() int {
@@ -105,17 +105,17 @@ func (c Card) Face() int {
 
 func (c Card) Value() int {
 	//TODO: value of jokers
-	if c.color == Jokers {
+	if c.suit == Jokers {
 		return 53
 	}
-	return int(c.color) + int(c.card)
+	return int(c.suit) + int(c.card)
 }
 
 func (c Card) String() string {
-	if c.card == JokerA {
+	if c.card == jokerA {
 		return "Joker A"
 	}
-	if c.card == JokerB {
+	if c.card == jokerB {
 		return "Joker B"
 	}
 	var name string = fmt.Sprintf("%d", c.card)
@@ -127,62 +127,62 @@ func (c Card) String() string {
 	case jack:
 		name = "J"
 	}
-	return fmt.Sprintf("%s %s", c.color.String(), name)
+	return fmt.Sprintf("%s %s", c.suit.String(), name)
 }
 
 var initialDeck = []Card{
-	{color: Clubs, card: ace},
-	{color: Clubs, card: two},
-	{color: Clubs, card: three},
-	{color: Clubs, card: four},
-	{color: Clubs, card: five},
-	{color: Clubs, card: six},
-	{color: Clubs, card: seven},
-	{color: Clubs, card: eight},
-	{color: Clubs, card: nine},
-	{color: Clubs, card: ten},
-	{color: Clubs, card: jack},
-	{color: Clubs, card: queen},
-	{color: Clubs, card: king},
-	{color: Diamonds, card: ace},
-	{color: Diamonds, card: two},
-	{color: Diamonds, card: three},
-	{color: Diamonds, card: four},
-	{color: Diamonds, card: five},
-	{color: Diamonds, card: six},
-	{color: Diamonds, card: seven},
-	{color: Diamonds, card: eight},
-	{color: Diamonds, card: nine},
-	{color: Diamonds, card: ten},
-	{color: Diamonds, card: jack},
-	{color: Diamonds, card: queen},
-	{color: Diamonds, card: king},
-	{color: Hearts, card: ace},
-	{color: Hearts, card: two},
-	{color: Hearts, card: three},
-	{color: Hearts, card: four},
-	{color: Hearts, card: five},
-	{color: Hearts, card: six},
-	{color: Hearts, card: seven},
-	{color: Hearts, card: eight},
-	{color: Hearts, card: nine},
-	{color: Hearts, card: ten},
-	{color: Hearts, card: jack},
-	{color: Hearts, card: queen},
-	{color: Hearts, card: king},
-	{color: Spades, card: ace},
-	{color: Spades, card: two},
-	{color: Spades, card: three},
-	{color: Spades, card: four},
-	{color: Spades, card: five},
-	{color: Spades, card: six},
-	{color: Spades, card: seven},
-	{color: Spades, card: eight},
-	{color: Spades, card: nine},
-	{color: Spades, card: ten},
-	{color: Spades, card: jack},
-	{color: Spades, card: queen},
-	{color: Spades, card: king},
-	{color: Jokers, card: JokerA},
-	{color: Jokers, card: JokerB},
+	{suit: Clubs, card: ace},
+	{suit: Clubs, card: two},
+	{suit: Clubs, card: three},
+	{suit: Clubs, card: four},
+	{suit: Clubs, card: five},
+	{suit: Clubs, card: six},
+	{suit: Clubs, card: seven},
+	{suit: Clubs, card: eight},
+	{suit: Clubs, card: nine},
+	{suit: Clubs, card: ten},
+	{suit: Clubs, card: jack},
+	{suit: Clubs, card: queen},
+	{suit: Clubs, card: king},
+	{suit: Diamonds, card: ace},
+	{suit: Diamonds, card: two},
+	{suit: Diamonds, card: three},
+	{suit: Diamonds, card: four},
+	{suit: Diamonds, card: five},
+	{suit: Diamonds, card: six},
+	{suit: Diamonds, card: seven},
+	{suit: Diamonds, card: eight},
+	{suit: Diamonds, card: nine},
+	{suit: Diamonds, card: ten},
+	{suit: Diamonds, card: jack},
+	{suit: Diamonds, card: queen},
+	{suit: Diamonds, card: king},
+	{suit: Hearts, card: ace},
+	{suit: Hearts, card: two},
+	{suit: Hearts, card: three},
+	{suit: Hearts, card: four},
+	{suit: Hearts, card: five},
+	{suit: Hearts, card: six},
+	{suit: Hearts, card: seven},
+	{suit: Hearts, card: eight},
+	{suit: Hearts, card: nine},
+	{suit: Hearts, card: ten},
+	{suit: Hearts, card: jack},
+	{suit: Hearts, card: queen},
+	{suit: Hearts, card: king},
+	{suit: Spades, card: ace},
+	{suit: Spades, card: two},
+	{suit: Spades, card: three},
+	{suit: Spades, card: four},
+	{suit: Spades, card: five},
+	{suit: Spades, card: six},
+	{suit: Spades, card: seven},
+	{suit: Spades, card: eight},
+	{suit: Spades, card: nine},
+	{suit: Spades, card: ten},
+	{suit: Spades, card: jack},
+	{suit: Spades, card: queen},
+	{suit: Spades, card: king},
+	{suit: Jokers, card: jokerA},
+	{suit: Jokers, card: jokerB},
 }
