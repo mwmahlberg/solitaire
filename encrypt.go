@@ -1,5 +1,9 @@
 package solitaire
 
+import (
+	"regexp"
+)
+
 const aUmlaut = 228
 const oUmlaut = 246
 const uUmlaut = 252
@@ -55,15 +59,18 @@ func normalizeCleartext(plaintext []byte) []byte {
 	return normalized
 }
 
+var nonLetters = regexp.MustCompile(`[^\p{L}]+`)
+
 func padClearText(plaintext []byte) []byte {
 	// Pad the plaintext to a multiple of 5
-	padLength := (5 - len(plaintext)%5) % 5
+	trimmed := nonLetters.ReplaceAll(plaintext, []byte(""))
+	padLength := (5 - len(trimmed)%5) % 5
 	if padLength == 0 {
-		return plaintext
+		return trimmed
 	}
-	padded := make([]byte, len(plaintext)+padLength)
-	copy(padded, plaintext)
-	for i := len(plaintext); i < len(padded); i++ {
+	padded := make([]byte, len(trimmed)+padLength)
+	copy(padded, trimmed)
+	for i := len(trimmed); i < len(padded); i++ {
 		padded[i] = 'X' // Padding character
 	}
 	return padded
