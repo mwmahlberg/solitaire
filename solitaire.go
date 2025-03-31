@@ -55,37 +55,22 @@ func (s *solitaire) Encrypt(plaintext []byte) ([]byte, error) {
 		ct[i] = findCharByIndex(idx)
 	}
 
-	// Format the ciphertext with a space between every 5 characters
-	// and a newline after every four groups.
-	formatted := make([]byte, 0, len(ct)+len(ct)/5+len(ct)/20)
-	groupCount := 0
-	for i, c := range ct {
-		if i > 0 && i%5 == 0 {
-			groupCount++
-			if groupCount%4 == 0 {
-				formatted = append(formatted, '\n')
-			} else {
-				formatted = append(formatted, ' ')
-			}
-		}
-		formatted = append(formatted, c)
-	}
-	ct = formatted
-	return ct, nil
+	return BlocksOfFive(ct), nil
 }
 
 func (s *solitaire) Decrypt(ciphertext []byte) ([]byte, error) {
+	cleaned := nonLetters.ReplaceAll(ciphertext, []byte(""))
 	// Normalize the ciphertext by removing spaces and converting to uppercase.
-	if len(ciphertext) == 0 || len(ciphertext)%5 != 0 {
+	if len(cleaned) == 0 || len(cleaned)%5 != 0 {
 		// If the ciphertext is empty or not a multiple of 5, PANIC!
 		panic("ciphertext must be a non-empty multiple of 5")
 	}
 	// Generate the keystream
-	keys := s.generateKeyStream(len(ciphertext))
+	keys := s.generateKeyStream(len(cleaned))
 
 	// Decrypt the ciphertext using the keystream.
-	ct := make([]byte, len(ciphertext))
-	for i, c := range ciphertext {
+	ct := make([]byte, len(cleaned))
+	for i, c := range cleaned {
 		n := findCharIndex(c)
 		key := keys[i]
 		idx := (n - key + 1) % len(alphabet)
@@ -94,7 +79,7 @@ func (s *solitaire) Decrypt(ciphertext []byte) ([]byte, error) {
 		}
 		ct[i] = findCharByIndex(idx)
 	}
-	return ct, nil
+	return BlocksOfFive(ct), nil
 }
 
 func (s *solitaire) generateKeyStream(length int) []int {

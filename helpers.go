@@ -75,3 +75,24 @@ func padClearText(plaintext []byte) []byte {
 	}
 	return padded
 }
+
+func BlocksOfFive(s []byte) []byte {
+
+	// This is a bit of a hack, but it works.
+	// Format the input with a space between every 5 characters
+	// and a newline after every four groups.
+	formatted := make([]byte, 0, len(s)+len(s)/5+len(s)/20)
+	groupCount := 0
+	for i, c := range s {
+		if i > 0 && i%5 == 0 {
+			groupCount++
+			if groupCount%4 == 0 {
+				formatted = append(formatted, '\n')
+			} else {
+				formatted = append(formatted, ' ')
+			}
+		}
+		formatted = append(formatted, c)
+	}
+	return formatted
+}

@@ -54,16 +54,16 @@ func (s *EncryptionSuite) TestPadding() {
 		input    []byte
 		expected []byte
 	}{
-		// {
-		// 	desc:     "no padding needed",
-		// 	input:    []byte("HELLOWORLD"),
-		// 	expected: []byte("HELLOWORLD"),
-		// },
-		// {
-		// 	desc:     "padding needed",
-		// 	input:    []byte("HI"),
-		// 	expected: []byte("HIXXX"),
-		// },
+		{
+			desc:     "no padding needed",
+			input:    []byte("HELLOWORLD"),
+			expected: []byte("HELLOWORLD"),
+		},
+		{
+			desc:     "padding needed",
+			input:    []byte("HI"),
+			expected: []byte("HIXXX"),
+		},
 		{
 			desc:     "padding needed, multiple of 5",
 			input:    []byte("foo\n"),
