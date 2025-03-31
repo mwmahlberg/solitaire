@@ -1,6 +1,10 @@
 package solitaire
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/awnumar/memguard"
+)
 
 type solitaire struct {
 	// The deck of cards used in the Solitaire encryption algorithm.
@@ -18,16 +22,14 @@ type SolitaireOption func(*solitaire) error
 // in the appropriate context.
 func WithPassphrase(passphrase []byte) SolitaireOption {
 	return func(s *solitaire) error {
-		// if passphrase == "" {
-		// 	return fmt.Errorf("passphrase cannot be empty")
-		// }
+
 		s.deck = &Deck{}
 		copy(s.deck[:], initialDeck)
 
 		// Set the position to 0
 		for _, c := range passphrase {
 			s.deck.Advance()
-			s.deck.countCut(findCharIndex(c) + 1)
+			s.deck.countCut(alphabet.Index(c) + 1)
 		}
 		return nil
 	}
@@ -83,6 +85,13 @@ func New(opts ...SolitaireOption) (*solitaire, error) {
 	return s, nil
 }
 
+func (s *solitaire) Deck() []Card {
+	// Return a copy of the deck
+	d := make([]Card, len(s.deck))
+	copy(d, s.deck[:])
+	return d
+}
+
 func (s *solitaire) Encrypt(plaintext []byte) ([]byte, error) {
 	// Normalize the plaintext by removing spaces and converting to uppercase.
 	normalized := normalizeCleartext(padClearText(plaintext))
@@ -93,52 +102,37 @@ func (s *solitaire) Encrypt(plaintext []byte) ([]byte, error) {
 	// The character at that index is used to encrypt the plaintext.
 	ct := make([]byte, len(normalized))
 	for i, c := range normalized {
-		n := findCharIndex(c)
+		n := alphabet.Index(c)
 		key := keys[i]
 		idx := (n + key + 1) % len(alphabet)
-		ct[i] = findCharByIndex(idx)
+		ct[i] = alphabet.Char(idx)
 	}
 
-	// Format the ciphertext with a space between every 5 characters
-	// and a newline after every four groups.
-	formatted := make([]byte, 0, len(ct)+len(ct)/5+len(ct)/20)
-	groupCount := 0
-	for i, c := range ct {
-		if i > 0 && i%5 == 0 {
-			groupCount++
-			if groupCount%4 == 0 {
-				formatted = append(formatted, '\n')
-			} else {
-				formatted = append(formatted, ' ')
-			}
-		}
-		formatted = append(formatted, c)
-	}
-	ct = formatted
-	return ct, nil
+	return BlocksOfFive(ct), nil
 }
 
 func (s *solitaire) Decrypt(ciphertext []byte) ([]byte, error) {
+	cleaned := nonLetters.ReplaceAll(ciphertext, []byte(""))
 	// Normalize the ciphertext by removing spaces and converting to uppercase.
-	if len(ciphertext) == 0 || len(ciphertext)%5 != 0 {
+	if len(cleaned) == 0 || len(cleaned)%5 != 0 {
 		// If the ciphertext is empty or not a multiple of 5, PANIC!
 		panic("ciphertext must be a non-empty multiple of 5")
 	}
 	// Generate the keystream
-	keys := s.generateKeyStream(len(ciphertext))
+	keys := s.generateKeyStream(len(cleaned))
 
 	// Decrypt the ciphertext using the keystream.
-	ct := make([]byte, len(ciphertext))
-	for i, c := range ciphertext {
-		n := findCharIndex(c)
+	ct := make([]byte, len(cleaned))
+	for i, c := range cleaned {
+		n := alphabet.Index(c)
 		key := keys[i]
 		idx := (n - key + 1) % len(alphabet)
 		if idx < 0 {
 			idx += len(alphabet)
 		}
-		ct[i] = findCharByIndex(idx)
+		ct[i] = alphabet.Char(idx)
 	}
-	return ct, nil
+	return BlocksOfFive(ct), nil
 }
 
 func (s *solitaire) generateKeyStream(length int) []int {
@@ -147,8 +141,8 @@ func (s *solitaire) generateKeyStream(length int) []int {
 	for i := 0; len(keys) < length; i++ {
 		s.deck.Advance()
 		val := s.deck[s.deck[0].Value()].Value()
-		if val == 53 {
-			// Skip the joker
+		if val >= 53 {
+			// Skip the jokers
 			continue
 		}
 		keys = append(keys, val)

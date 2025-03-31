@@ -1,9 +1,62 @@
 package solitaire
 
-type card int
+import "fmt"
+
+type rank int
+
+func (r *rank) String() string {
+	switch *r {
+	case ace:
+		return "Ace"
+	case two:
+		return "2"
+	case three:
+		return "3"
+	case four:
+		return "4"
+	case five:
+		return "5"
+	case six:
+		return "6"
+	case seven:
+		return "7"
+	case eight:
+		return "8"
+	case nine:
+		return "9"
+	case ten:
+		return "10"
+	case jack:
+		return "Jack"
+	case queen:
+		return "Queen"
+	case king:
+		return "King"
+	default:
+		panic("invalid rank")
+	}
+}
+
+func (r *rank) Short() string {
+	switch *r {
+	case ace:
+		return "A"
+	case jack:
+		return "J"
+	case queen:
+		return "Q"
+	case king:
+		return "K"
+	default:
+		return r.String()
+	}
+}
 
 const (
-	one card = iota + 1
+	// TODO: Make this zero-based
+	// While it is more intuitive to have the first card be 1, it is not
+	// necessary for the algorithm.
+	ace rank = iota + 1
 	two
 	three
 	four
@@ -16,18 +69,15 @@ const (
 	jack
 	queen
 	king
-	ace
-	jokerA card = 53
-	jokerB card = 54
+
+	jokerA rank = 53
+	jokerB rank = 54
 )
 
-var alphabet = [26]byte{
-	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-	'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-	'U', 'V', 'W', 'X', 'Y', 'Z'}
+type defaultAlphabet [26]byte
 
-func findCharIndex(b byte) int {
-	for i, c := range alphabet {
+func (t defaultAlphabet) Index(b byte) int {
+	for i, c := range t {
 		if b == c {
 			return i
 		}
@@ -35,117 +85,150 @@ func findCharIndex(b byte) int {
 	return -1
 }
 
-func findCharByIndex(i int) byte {
-	i = i % 26
-	if i == 0 {
-		i = 26
+func (t defaultAlphabet) Char(index int) byte {
+	index = index % 26
+	if index == 0 {
+		index = 26
 	}
-	return alphabet[i-1]
+	return alphabet[index-1]
 }
 
-type color int
+var alphabet = defaultAlphabet{
+	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+	'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+	'U', 'V', 'W', 'X', 'Y', 'Z'}
+
+type suit int
 
 const (
-	clubs    color = 0
-	diamonds color = 13
-	hearts   color = 26
-	spades   color = 39
-	jokers   color = 52
+	Clubs    suit = 0
+	Diamonds suit = 13
+	Hearts   suit = 26
+	Spades   suit = 39
 )
 
-func (c color) String() string {
+func (c suit) String() string {
 	switch c {
-	case clubs:
-		return "C"
-	case diamonds:
-		return "D"
-	case hearts:
-		return "H"
-	case spades:
-		return "S"
-	case jokers:
-		return "J"
+	case Clubs:
+		return "♣"
+	case Diamonds:
+		return "♦"
+	case Hearts:
+		return "♥"
+	case Spades:
+		return "♠"
 	default:
-		return ""
+		// This case is only necessary to satisfy the compiler.
+		// In practice, this should never happen because the suit
+		// is always one of the defined constants.
+		// If it does, it means that the code is incorrect.
+		// In that case, we panic to indicate a programming error.
+		panic("invalid suit")
 	}
 }
 
-func (c color) Value(card int) int {
-	if card < 1 || card > 13 {
+func (c suit) Value(rank int) int {
+	if rank < 1 || rank > 13 {
 		panic("card must be between 1 and 13")
 	}
-	if (card+int(c))%26 == 0 {
+	if (rank+int(c))%26 == 0 {
 		return 26
 	}
-	return (card + int(c)) % 26
+	return (rank + int(c)) % 26
 }
 
 type Card struct {
-	color color
-	card  card
+	suit suit
+	rank rank
+}
+
+func (c Card) IsJokerA() bool {
+	return c.rank == jokerA
+}
+
+func (c Card) IsJokerB() bool {
+	return c.rank == jokerB
+}
+
+func (c Card) Suit() suit {
+	return c.suit
+}
+
+func (c Card) Rank() rank {
+	return c.rank
 }
 
 func (c Card) Value() int {
-	//TODO: value of jokers
-	if c.color == jokers {
+	if c.IsJokerA() || c.IsJokerB() {
 		return 53
 	}
-	return int(c.color) + int(c.card)
+	return int(c.suit) + int(c.rank)
+}
+
+func (c Card) String() string {
+	if c.rank == jokerA {
+		return "Joker A"
+	}
+	if c.rank == jokerB {
+		return "Joker B"
+	}
+
+	return fmt.Sprintf("%s %s", c.suit.String(), c.rank.Short())
 }
 
 var initialDeck = []Card{
-	{color: clubs, card: one},
-	{color: clubs, card: two},
-	{color: clubs, card: three},
-	{color: clubs, card: four},
-	{color: clubs, card: five},
-	{color: clubs, card: six},
-	{color: clubs, card: seven},
-	{color: clubs, card: eight},
-	{color: clubs, card: nine},
-	{color: clubs, card: ten},
-	{color: clubs, card: jack},
-	{color: clubs, card: queen},
-	{color: clubs, card: king},
-	{color: diamonds, card: one},
-	{color: diamonds, card: two},
-	{color: diamonds, card: three},
-	{color: diamonds, card: four},
-	{color: diamonds, card: five},
-	{color: diamonds, card: six},
-	{color: diamonds, card: seven},
-	{color: diamonds, card: eight},
-	{color: diamonds, card: nine},
-	{color: diamonds, card: ten},
-	{color: diamonds, card: jack},
-	{color: diamonds, card: queen},
-	{color: diamonds, card: king},
-	{color: hearts, card: one},
-	{color: hearts, card: two},
-	{color: hearts, card: three},
-	{color: hearts, card: four},
-	{color: hearts, card: five},
-	{color: hearts, card: six},
-	{color: hearts, card: seven},
-	{color: hearts, card: eight},
-	{color: hearts, card: nine},
-	{color: hearts, card: ten},
-	{color: hearts, card: jack},
-	{color: hearts, card: queen},
-	{color: hearts, card: king},
-	{color: spades, card: one},
-	{color: spades, card: two},
-	{color: spades, card: three},
-	{color: spades, card: four},
-	{color: spades, card: five},
-	{color: spades, card: six},
-	{color: spades, card: seven},
-	{color: spades, card: eight},
-	{color: spades, card: nine},
-	{color: spades, card: ten},
-	{color: spades, card: jack},
-	{color: spades, card: queen},
-	{color: spades, card: king},
-	{color: jokers, card: jokerA},
-	{color: jokers, card: jokerB},
+	{suit: Clubs, rank: ace},
+	{suit: Clubs, rank: two},
+	{suit: Clubs, rank: three},
+	{suit: Clubs, rank: four},
+	{suit: Clubs, rank: five},
+	{suit: Clubs, rank: six},
+	{suit: Clubs, rank: seven},
+	{suit: Clubs, rank: eight},
+	{suit: Clubs, rank: nine},
+	{suit: Clubs, rank: ten},
+	{suit: Clubs, rank: jack},
+	{suit: Clubs, rank: queen},
+	{suit: Clubs, rank: king},
+	{suit: Diamonds, rank: ace},
+	{suit: Diamonds, rank: two},
+	{suit: Diamonds, rank: three},
+	{suit: Diamonds, rank: four},
+	{suit: Diamonds, rank: five},
+	{suit: Diamonds, rank: six},
+	{suit: Diamonds, rank: seven},
+	{suit: Diamonds, rank: eight},
+	{suit: Diamonds, rank: nine},
+	{suit: Diamonds, rank: ten},
+	{suit: Diamonds, rank: jack},
+	{suit: Diamonds, rank: queen},
+	{suit: Diamonds, rank: king},
+	{suit: Hearts, rank: ace},
+	{suit: Hearts, rank: two},
+	{suit: Hearts, rank: three},
+	{suit: Hearts, rank: four},
+	{suit: Hearts, rank: five},
+	{suit: Hearts, rank: six},
+	{suit: Hearts, rank: seven},
+	{suit: Hearts, rank: eight},
+	{suit: Hearts, rank: nine},
+	{suit: Hearts, rank: ten},
+	{suit: Hearts, rank: jack},
+	{suit: Hearts, rank: queen},
+	{suit: Hearts, rank: king},
+	{suit: Spades, rank: ace},
+	{suit: Spades, rank: two},
+	{suit: Spades, rank: three},
+	{suit: Spades, rank: four},
+	{suit: Spades, rank: five},
+	{suit: Spades, rank: six},
+	{suit: Spades, rank: seven},
+	{suit: Spades, rank: eight},
+	{suit: Spades, rank: nine},
+	{suit: Spades, rank: ten},
+	{suit: Spades, rank: jack},
+	{suit: Spades, rank: queen},
+	{suit: Spades, rank: king},
+	{rank: jokerA},
+	{rank: jokerB},
 }

@@ -56,13 +56,13 @@ func TestDecryption(t *testing.T) {
 	}{
 		{
 			passphrase: "CRYPTONOMICON",
-			cleartext:  "SOLITAIREX",
-			ciphertext: "KIRAKSFJAN",
+			cleartext:  "SOLIT AIREX",
+			ciphertext: "KIRAK SFJAN",
 		},
 		{
 			passphrase: "FOO",
-			cleartext:  "AAAAAAAAAAAAAAA",
-			ciphertext: "ITHZUJIWGRFARMW",
+			cleartext:  "AAAAA AAAAA AAAAA",
+			ciphertext: "ITHZU JIWGR FARMW",
 		},
 	}
 	for _, tC := range testCases {
