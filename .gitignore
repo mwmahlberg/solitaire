@@ -1,0 +1,3 @@
+cmd/solitaire
+# Added by goreleaser init:
+dist/
