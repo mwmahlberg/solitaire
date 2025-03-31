@@ -28,5 +28,5 @@ func TestMove(t *testing.T) {
 	assert.Equal(t, 1, jokerBafterRound2, "Joker B should be at position 1 after round 2")
 	assert.Equal(t, 1, d[0].Value())
 	assert.Equal(t, Clubs, d[0].suit)
-	assert.Equal(t, 1, int(d[0].card))
+	assert.Equal(t, 1, int(d[0].rank))
 }

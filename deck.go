@@ -33,11 +33,11 @@ func (d *Deck) find(card Card) int {
 }
 func (d *Deck) FindJokerB() int {
 	// Find the index of the black joker in the deck.
-	return d.find(Card{suit: Jokers, card: jokerB})
+	return d.find(Card{suit: Jokers, rank: jokerB})
 }
 
 func (d *Deck) FindJokerA() int {
-	return d.find(Card{suit: Jokers, card: jokerA})
+	return d.find(Card{suit: Jokers, rank: jokerA})
 }
 
 func (d *Deck) FindFirstJoker() int {

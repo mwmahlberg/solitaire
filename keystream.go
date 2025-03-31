@@ -2,10 +2,10 @@ package solitaire
 
 import "fmt"
 
-type card int
+type rank int
 
 const (
-	ace card = iota + 1
+	ace rank = iota + 1
 	two
 	three
 	four
@@ -19,8 +19,8 @@ const (
 	queen
 	king
 
-	jokerA card = 53
-	jokerB card = 54
+	jokerA rank = 53
+	jokerB rank = 54
 )
 
 var alphabet = [26]byte{
@@ -72,27 +72,27 @@ func (c suit) String() string {
 	}
 }
 
-func (c suit) Value(card int) int {
-	if card < 1 || card > 13 {
+func (c suit) Value(rank int) int {
+	if rank < 1 || rank > 13 {
 		panic("card must be between 1 and 13")
 	}
-	if (card+int(c))%26 == 0 {
+	if (rank+int(c))%26 == 0 {
 		return 26
 	}
-	return (card + int(c)) % 26
+	return (rank + int(c)) % 26
 }
 
 type Card struct {
 	suit suit
-	card card
+	rank rank
 }
 
 func (c Card) IsJokerA() bool {
-	return c.card == jokerA
+	return c.rank == jokerA
 }
 
 func (c Card) IsJokerB() bool {
-	return c.card == jokerB
+	return c.rank == jokerB
 }
 
 func (c Card) Suit() suit {
@@ -100,7 +100,7 @@ func (c Card) Suit() suit {
 }
 
 func (c Card) Face() int {
-	return int(c.card)
+	return int(c.rank)
 }
 
 func (c Card) Value() int {
@@ -108,18 +108,18 @@ func (c Card) Value() int {
 	if c.suit == Jokers {
 		return 53
 	}
-	return int(c.suit) + int(c.card)
+	return int(c.suit) + int(c.rank)
 }
 
 func (c Card) String() string {
-	if c.card == jokerA {
+	if c.rank == jokerA {
 		return "Joker A"
 	}
-	if c.card == jokerB {
+	if c.rank == jokerB {
 		return "Joker B"
 	}
-	var name string = fmt.Sprintf("%d", c.card)
-	switch c.card {
+	var name string = fmt.Sprintf("%d", c.rank)
+	switch c.rank {
 	case king:
 		name = "K"
 	case queen:
@@ -131,58 +131,58 @@ func (c Card) String() string {
 }
 
 var initialDeck = []Card{
-	{suit: Clubs, card: ace},
-	{suit: Clubs, card: two},
-	{suit: Clubs, card: three},
-	{suit: Clubs, card: four},
-	{suit: Clubs, card: five},
-	{suit: Clubs, card: six},
-	{suit: Clubs, card: seven},
-	{suit: Clubs, card: eight},
-	{suit: Clubs, card: nine},
-	{suit: Clubs, card: ten},
-	{suit: Clubs, card: jack},
-	{suit: Clubs, card: queen},
-	{suit: Clubs, card: king},
-	{suit: Diamonds, card: ace},
-	{suit: Diamonds, card: two},
-	{suit: Diamonds, card: three},
-	{suit: Diamonds, card: four},
-	{suit: Diamonds, card: five},
-	{suit: Diamonds, card: six},
-	{suit: Diamonds, card: seven},
-	{suit: Diamonds, card: eight},
-	{suit: Diamonds, card: nine},
-	{suit: Diamonds, card: ten},
-	{suit: Diamonds, card: jack},
-	{suit: Diamonds, card: queen},
-	{suit: Diamonds, card: king},
-	{suit: Hearts, card: ace},
-	{suit: Hearts, card: two},
-	{suit: Hearts, card: three},
-	{suit: Hearts, card: four},
-	{suit: Hearts, card: five},
-	{suit: Hearts, card: six},
-	{suit: Hearts, card: seven},
-	{suit: Hearts, card: eight},
-	{suit: Hearts, card: nine},
-	{suit: Hearts, card: ten},
-	{suit: Hearts, card: jack},
-	{suit: Hearts, card: queen},
-	{suit: Hearts, card: king},
-	{suit: Spades, card: ace},
-	{suit: Spades, card: two},
-	{suit: Spades, card: three},
-	{suit: Spades, card: four},
-	{suit: Spades, card: five},
-	{suit: Spades, card: six},
-	{suit: Spades, card: seven},
-	{suit: Spades, card: eight},
-	{suit: Spades, card: nine},
-	{suit: Spades, card: ten},
-	{suit: Spades, card: jack},
-	{suit: Spades, card: queen},
-	{suit: Spades, card: king},
-	{suit: Jokers, card: jokerA},
-	{suit: Jokers, card: jokerB},
+	{suit: Clubs, rank: ace},
+	{suit: Clubs, rank: two},
+	{suit: Clubs, rank: three},
+	{suit: Clubs, rank: four},
+	{suit: Clubs, rank: five},
+	{suit: Clubs, rank: six},
+	{suit: Clubs, rank: seven},
+	{suit: Clubs, rank: eight},
+	{suit: Clubs, rank: nine},
+	{suit: Clubs, rank: ten},
+	{suit: Clubs, rank: jack},
+	{suit: Clubs, rank: queen},
+	{suit: Clubs, rank: king},
+	{suit: Diamonds, rank: ace},
+	{suit: Diamonds, rank: two},
+	{suit: Diamonds, rank: three},
+	{suit: Diamonds, rank: four},
+	{suit: Diamonds, rank: five},
+	{suit: Diamonds, rank: six},
+	{suit: Diamonds, rank: seven},
+	{suit: Diamonds, rank: eight},
+	{suit: Diamonds, rank: nine},
+	{suit: Diamonds, rank: ten},
+	{suit: Diamonds, rank: jack},
+	{suit: Diamonds, rank: queen},
+	{suit: Diamonds, rank: king},
+	{suit: Hearts, rank: ace},
+	{suit: Hearts, rank: two},
+	{suit: Hearts, rank: three},
+	{suit: Hearts, rank: four},
+	{suit: Hearts, rank: five},
+	{suit: Hearts, rank: six},
+	{suit: Hearts, rank: seven},
+	{suit: Hearts, rank: eight},
+	{suit: Hearts, rank: nine},
+	{suit: Hearts, rank: ten},
+	{suit: Hearts, rank: jack},
+	{suit: Hearts, rank: queen},
+	{suit: Hearts, rank: king},
+	{suit: Spades, rank: ace},
+	{suit: Spades, rank: two},
+	{suit: Spades, rank: three},
+	{suit: Spades, rank: four},
+	{suit: Spades, rank: five},
+	{suit: Spades, rank: six},
+	{suit: Spades, rank: seven},
+	{suit: Spades, rank: eight},
+	{suit: Spades, rank: nine},
+	{suit: Spades, rank: ten},
+	{suit: Spades, rank: jack},
+	{suit: Spades, rank: queen},
+	{suit: Spades, rank: king},
+	{suit: Jokers, rank: jokerA},
+	{suit: Jokers, rank: jokerB},
 }
