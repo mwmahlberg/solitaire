@@ -4,6 +4,54 @@ import "fmt"
 
 type rank int
 
+func (r *rank) String() string {
+	switch *r {
+	case ace:
+		return "Ace"
+	case two:
+		return "2"
+	case three:
+		return "3"
+	case four:
+		return "4"
+	case five:
+		return "5"
+	case six:
+		return "6"
+	case seven:
+		return "7"
+	case eight:
+		return "8"
+	case nine:
+		return "9"
+	case ten:
+		return "10"
+	case jack:
+		return "Jack"
+	case queen:
+		return "Queen"
+	case king:
+		return "King"
+	default:
+		panic("invalid rank")
+	}
+}
+
+func (r *rank) Short() string {
+	switch *r {
+	case ace:
+		return "A"
+	case jack:
+		return "J"
+	case queen:
+		return "Q"
+	case king:
+		return "K"
+	default:
+		return r.String()
+	}
+}
+
 const (
 	ace rank = iota + 1
 	two
@@ -23,13 +71,10 @@ const (
 	jokerB rank = 54
 )
 
-var alphabet = [26]byte{
-	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-	'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-	'U', 'V', 'W', 'X', 'Y', 'Z'}
+type defaultAlphabet [26]byte
 
-func findCharIndex(b byte) int {
-	for i, c := range alphabet {
+func (t defaultAlphabet) Index(b byte) int {
+	for i, c := range t {
 		if b == c {
 			return i
 		}
@@ -37,13 +82,18 @@ func findCharIndex(b byte) int {
 	return -1
 }
 
-func findCharByIndex(i int) byte {
-	i = i % 26
-	if i == 0 {
-		i = 26
+func (t defaultAlphabet) Char(index int) byte {
+	index = index % 26
+	if index == 0 {
+		index = 26
 	}
-	return alphabet[i-1]
+	return alphabet[index-1]
 }
+
+var alphabet = defaultAlphabet{
+	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+	'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+	'U', 'V', 'W', 'X', 'Y', 'Z'}
 
 type suit int
 
@@ -52,7 +102,6 @@ const (
 	Diamonds suit = 13
 	Hearts   suit = 26
 	Spades   suit = 39
-	Jokers   suit = 52
 )
 
 func (c suit) String() string {
@@ -65,10 +114,13 @@ func (c suit) String() string {
 		return "♥"
 	case Spades:
 		return "♠"
-	case Jokers:
-		return "J"
 	default:
-		return ""
+		// This case is only necessary to satisfy the compiler.
+		// In practice, this should never happen because the suit
+		// is always one of the defined constants.
+		// If it does, it means that the code is incorrect.
+		// In that case, we panic to indicate a programming error.
+		panic("invalid suit")
 	}
 }
 
@@ -99,13 +151,12 @@ func (c Card) Suit() suit {
 	return c.suit
 }
 
-func (c Card) Face() int {
+func (c Card) Rank() int {
 	return int(c.rank)
 }
 
 func (c Card) Value() int {
-	//TODO: value of jokers
-	if c.suit == Jokers {
+	if c.IsJokerA() || c.IsJokerB() {
 		return 53
 	}
 	return int(c.suit) + int(c.rank)
@@ -183,6 +234,6 @@ var initialDeck = []Card{
 	{suit: Spades, rank: jack},
 	{suit: Spades, rank: queen},
 	{suit: Spades, rank: king},
-	{suit: Jokers, rank: jokerA},
-	{suit: Jokers, rank: jokerB},
+	{rank: jokerA},
+	{rank: jokerB},
 }

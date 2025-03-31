@@ -22,7 +22,7 @@ func WithPassphrase(passphrase []byte) SolitaireOption {
 		// Set the position to 0
 		for _, c := range passphrase {
 			s.deck.Advance()
-			s.deck.countCut(findCharIndex(c) + 1)
+			s.deck.countCut(alphabet.Index(c) + 1)
 		}
 		return nil
 	}
@@ -82,10 +82,10 @@ func (s *solitaire) Encrypt(plaintext []byte) ([]byte, error) {
 	// The character at that index is used to encrypt the plaintext.
 	ct := make([]byte, len(normalized))
 	for i, c := range normalized {
-		n := findCharIndex(c)
+		n := alphabet.Index(c)
 		key := keys[i]
 		idx := (n + key + 1) % len(alphabet)
-		ct[i] = findCharByIndex(idx)
+		ct[i] = alphabet.Char(idx)
 	}
 
 	return BlocksOfFive(ct), nil
@@ -104,13 +104,13 @@ func (s *solitaire) Decrypt(ciphertext []byte) ([]byte, error) {
 	// Decrypt the ciphertext using the keystream.
 	ct := make([]byte, len(cleaned))
 	for i, c := range cleaned {
-		n := findCharIndex(c)
+		n := alphabet.Index(c)
 		key := keys[i]
 		idx := (n - key + 1) % len(alphabet)
 		if idx < 0 {
 			idx += len(alphabet)
 		}
-		ct[i] = findCharByIndex(idx)
+		ct[i] = alphabet.Char(idx)
 	}
 	return BlocksOfFive(ct), nil
 }
@@ -121,8 +121,8 @@ func (s *solitaire) generateKeyStream(length int) []int {
 	for i := 0; len(keys) < length; i++ {
 		s.deck.Advance()
 		val := s.deck[s.deck[0].Value()].Value()
-		if val == 53 {
-			// Skip the joker
+		if val >= 53 {
+			// Skip the jokers
 			continue
 		}
 		keys = append(keys, val)
