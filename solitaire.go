@@ -1,18 +1,18 @@
-/* 
+/*
  *  Copyright 2025 Markus Mahlberg <138420+mwmahlberg@users.noreply.github.com>
- *  
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- *  
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *  
+ *
  */
 
 package solitaire
@@ -25,7 +25,8 @@ import (
 
 type solitaire struct {
 	// The deck of cards used in the Solitaire encryption algorithm.
-	deck *Deck
+	deck     *Deck
+	alphabet alphabet
 }
 
 type SolitaireOption func(*solitaire) error
@@ -46,7 +47,7 @@ func WithPassphrase(passphrase []byte) SolitaireOption {
 		// Set the position to 0
 		for _, c := range passphrase {
 			s.deck.Advance()
-			s.deck.countCut(DefaultAlphabet.Index(c) + 1)
+			s.deck.countCut(s.alphabet.Index(c) + 1)
 		}
 		return nil
 	}
@@ -90,7 +91,9 @@ func WithPassphraseFromEnclave(passphrase *memguard.Enclave) SolitaireOption {
 }
 
 func New(opts ...SolitaireOption) (*solitaire, error) {
-	s := &solitaire{}
+	s := &solitaire{
+		alphabet: DefaultAlphabet,
+	}
 	for _, opt := range opts {
 		if err := opt(s); err != nil {
 			return nil, err
@@ -119,10 +122,10 @@ func (s *solitaire) Encrypt(plaintext []byte) ([]byte, error) {
 	// The character at that index is used to encrypt the plaintext.
 	ct := make([]byte, len(normalized))
 	for i, c := range normalized {
-		n := DefaultAlphabet.Index(c)
+		n := s.alphabet.Index(c)
 		key := keys[i]
-		idx := (n + key + 1) % len(DefaultAlphabet)
-		ct[i] = DefaultAlphabet.Char(idx)
+		idx := (n + key + 1) % len(s.alphabet)
+		ct[i] = s.alphabet.Cchar(idx)
 	}
 
 	return BlocksOfFive(ct), nil
@@ -141,13 +144,13 @@ func (s *solitaire) Decrypt(ciphertext []byte) ([]byte, error) {
 	// Decrypt the ciphertext using the keystream.
 	ct := make([]byte, len(cleaned))
 	for i, c := range cleaned {
-		n := DefaultAlphabet.Index(c)
+		n := s.alphabet.Index(c)
 		key := keys[i]
-		idx := (n - key + 1) % len(DefaultAlphabet)
+		idx := (n - key + 1) % len(s.alphabet)
 		if idx < 0 {
-			idx += len(DefaultAlphabet)
+			idx += len(s.alphabet)
 		}
-		ct[i] = DefaultAlphabet.Char(idx)
+		ct[i] = s.alphabet.Cchar(idx)
 	}
 	return BlocksOfFive(ct), nil
 }
