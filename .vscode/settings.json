@@ -1,0 +1,11 @@
+{
+    "markdown.validate.enabled": true,
+    "markdown.extension.toc.levels": "2..6",
+    "markdown.extention.toc.slugifyMode": "github",
+    "markdown.extension.toc.omittedFromToc": {
+        // Use a path relative to your workspace.
+        "README.md": [
+            "## Table of Contents",
+        ]
+    }
+}

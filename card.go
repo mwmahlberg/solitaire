@@ -1,3 +1,20 @@
+/*
+ *  Copyright 2025 Markus Mahlberg <138420+mwmahlberg@users.noreply.github.com>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 package solitaire
 
 import "fmt"
@@ -74,30 +91,6 @@ const (
 	jokerB rank = 54
 )
 
-type defaultAlphabet [26]byte
-
-func (t defaultAlphabet) Index(b byte) int {
-	for i, c := range t {
-		if b == c {
-			return i
-		}
-	}
-	return -1
-}
-
-func (t defaultAlphabet) Char(index int) byte {
-	index = index % 26
-	if index == 0 {
-		index = 26
-	}
-	return alphabet[index-1]
-}
-
-var alphabet = defaultAlphabet{
-	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-	'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-	'U', 'V', 'W', 'X', 'Y', 'Z'}
-
 type suit int
 
 const (
@@ -150,6 +143,10 @@ func (c Card) IsJokerB() bool {
 	return c.rank == jokerB
 }
 
+func (c Card) IsJoker() bool {
+	return c.IsJokerA() || c.IsJokerB()
+}
+
 func (c Card) Suit() suit {
 	return c.suit
 }
@@ -159,17 +156,17 @@ func (c Card) Rank() rank {
 }
 
 func (c Card) Value() int {
-	if c.IsJokerA() || c.IsJokerB() {
+	if c.IsJoker() {
 		return 53
 	}
 	return int(c.suit) + int(c.rank)
 }
 
 func (c Card) String() string {
-	if c.rank == jokerA {
+	if c.IsJokerA() {
 		return "Joker A"
 	}
-	if c.rank == jokerB {
+	if c.IsJokerB() {
 		return "Joker B"
 	}
 

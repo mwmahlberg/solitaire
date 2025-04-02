@@ -1,3 +1,20 @@
+/* 
+ *  Copyright 2025 Markus Mahlberg <138420+mwmahlberg@users.noreply.github.com>
+ *  
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *  
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *  
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *  
+ */
+
 package solitaire
 
 import (
@@ -29,7 +46,7 @@ func WithPassphrase(passphrase []byte) SolitaireOption {
 		// Set the position to 0
 		for _, c := range passphrase {
 			s.deck.Advance()
-			s.deck.countCut(alphabet.Index(c) + 1)
+			s.deck.countCut(DefaultAlphabet.Index(c) + 1)
 		}
 		return nil
 	}
@@ -95,17 +112,17 @@ func (s *solitaire) Deck() []Card {
 func (s *solitaire) Encrypt(plaintext []byte) ([]byte, error) {
 	// Normalize the plaintext by removing spaces and converting to uppercase.
 	normalized := normalizeCleartext(padClearText(plaintext))
-	keys := s.generateKeyStream(len(normalized))
+	keys := s.deck.generateKeyStream(len(normalized))
 
 	// Encrypt the plaintext using the keystream.
 	// The keystream is used to determine the index of the character in the matrix.
 	// The character at that index is used to encrypt the plaintext.
 	ct := make([]byte, len(normalized))
 	for i, c := range normalized {
-		n := alphabet.Index(c)
+		n := DefaultAlphabet.Index(c)
 		key := keys[i]
-		idx := (n + key + 1) % len(alphabet)
-		ct[i] = alphabet.Char(idx)
+		idx := (n + key + 1) % len(DefaultAlphabet)
+		ct[i] = DefaultAlphabet.Char(idx)
 	}
 
 	return BlocksOfFive(ct), nil
@@ -119,33 +136,18 @@ func (s *solitaire) Decrypt(ciphertext []byte) ([]byte, error) {
 		panic("ciphertext must be a non-empty multiple of 5")
 	}
 	// Generate the keystream
-	keys := s.generateKeyStream(len(cleaned))
+	keys := s.deck.generateKeyStream(len(cleaned))
 
 	// Decrypt the ciphertext using the keystream.
 	ct := make([]byte, len(cleaned))
 	for i, c := range cleaned {
-		n := alphabet.Index(c)
+		n := DefaultAlphabet.Index(c)
 		key := keys[i]
-		idx := (n - key + 1) % len(alphabet)
+		idx := (n - key + 1) % len(DefaultAlphabet)
 		if idx < 0 {
-			idx += len(alphabet)
+			idx += len(DefaultAlphabet)
 		}
-		ct[i] = alphabet.Char(idx)
+		ct[i] = DefaultAlphabet.Char(idx)
 	}
 	return BlocksOfFive(ct), nil
-}
-
-func (s *solitaire) generateKeyStream(length int) []int {
-	// Generate the keystream by moving the jokers and cutting the deck.
-	keys := make([]int, 0)
-	for i := 0; len(keys) < length; i++ {
-		s.deck.Advance()
-		val := s.deck[s.deck[0].Value()].Value()
-		if val >= 53 {
-			// Skip the jokers
-			continue
-		}
-		keys = append(keys, val)
-	}
-	return keys
 }

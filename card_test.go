@@ -1,3 +1,20 @@
+/*
+ *  Copyright 2025 Markus Mahlberg <138420+mwmahlberg@users.noreply.github.com>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 package solitaire
 
 import (
@@ -7,56 +24,11 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type KeyStreamSuite struct {
+type SuitTests struct {
 	suite.Suite
 }
 
-func (s *KeyStreamSuite) TestSuitString() {
-	testCases := []struct {
-		desc     string
-		suit     suit
-		expected string
-	}{
-		{
-			desc:     "Clubs",
-			suit:     Clubs,
-			expected: "♣",
-		},
-		{
-			desc:     "Diamonds",
-			suit:     Diamonds,
-			expected: "♦",
-		},
-		{
-			desc:     "Hearts",
-			suit:     Hearts,
-			expected: "♥",
-		},
-		{
-			desc:     "Spades",
-			suit:     Spades,
-			expected: "♠",
-		},
-	}
-
-	for _, tC := range testCases {
-		s.Run(tC.desc, func() {
-			result := tC.suit.String()
-			s.Equal(tC.expected, result)
-		})
-	}
-
-}
-
-func (s *KeyStreamSuite) TestSuitInvalid() {
-	var suitInvalidSuit = suit(100)
-	s.Panics(func() {
-		str := suitInvalidSuit.String()
-		s.Fail("Expected panic, but got: ", str)
-	})
-}
-
-func (s *KeyStreamSuite) TestSuitValue() {
+func (s *SuitTests) TestSuitValue() {
 	testCases := []struct {
 		desc    string
 		suit    suit
@@ -98,7 +70,44 @@ func (s *KeyStreamSuite) TestSuitValue() {
 	}
 }
 
-func (s *KeyStreamSuite) TestSuitValueInvalid() {
+func (s *SuitTests) TestSuitString() {
+	testCases := []struct {
+		desc     string
+		suit     suit
+		expected string
+	}{
+		{
+			desc:     "Clubs",
+			suit:     Clubs,
+			expected: "♣",
+		},
+		{
+			desc:     "Diamonds",
+			suit:     Diamonds,
+			expected: "♦",
+		},
+		{
+			desc:     "Hearts",
+			suit:     Hearts,
+			expected: "♥",
+		},
+		{
+			desc:     "Spades",
+			suit:     Spades,
+			expected: "♠",
+		},
+	}
+
+	for _, tC := range testCases {
+		s.Run(tC.desc, func() {
+			result := tC.suit.String()
+			s.Equal(tC.expected, result)
+		})
+	}
+
+}
+
+func (s *SuitTests) TestSuitValueInvalid() {
 	s.Panics(func() {
 		Clubs.Value(14)
 	})
@@ -107,7 +116,19 @@ func (s *KeyStreamSuite) TestSuitValueInvalid() {
 	})
 }
 
-func (s *KeyStreamSuite) TestRankString() {
+func (s *SuitTests) TestSuitInvalid() {
+	var suitInvalidSuit = suit(100)
+	s.Panics(func() {
+		str := suitInvalidSuit.String()
+		s.Fail("Expected panic, but got: ", str)
+	})
+}
+
+type RankTests struct {
+	suite.Suite
+}
+
+func (s *RankTests) TestRankString() {
 	testCases := []struct {
 		desc     string
 		rank     rank
@@ -148,7 +169,7 @@ func (s *KeyStreamSuite) TestRankString() {
 	}
 }
 
-func (s *KeyStreamSuite) TestRankStringNonFace() {
+func (s *RankTests) TestRankStringNonFace() {
 	for i := 3; i <= 10; i++ {
 		r := rank(i)
 		s.Run(r.String(), func() {
@@ -158,7 +179,7 @@ func (s *KeyStreamSuite) TestRankStringNonFace() {
 	}
 }
 
-func (s *KeyStreamSuite) TestRankInvalid() {
+func (s *RankTests) TestRankInvalid() {
 	var rankInvalidRank = rank(100)
 	s.Panics(func() {
 		str := rankInvalidRank.String()
@@ -166,7 +187,7 @@ func (s *KeyStreamSuite) TestRankInvalid() {
 	})
 }
 
-func (s *KeyStreamSuite) TestRankShort() {
+func (s *RankTests) TestRankShort() {
 	testCases := []struct {
 		desc     string
 		rank     rank
@@ -207,7 +228,7 @@ func (s *KeyStreamSuite) TestRankShort() {
 	}
 }
 
-func (s *KeyStreamSuite) TestRankShortNonFace() {
+func (s *RankTests) TestRankShortNonFace() {
 	for i := 3; i <= 10; i++ {
 		r := rank(i)
 		s.Run(r.String(), func() {
@@ -217,12 +238,11 @@ func (s *KeyStreamSuite) TestRankShortNonFace() {
 	}
 }
 
-func (s *KeyStreamSuite) TestDefaultAlphabetNotPresent() {
-	idx := alphabet.Index(byte('@'))
-	s.Equal(-1, idx, "Expected -1 for non-alphabet character")
+type CardTests struct {
+	suite.Suite
 }
 
-func (s *KeyStreamSuite) TestCardSuit() {
+func (s *CardTests) TestCardSuit() {
 	c := Card{rank: ace, suit: Clubs}
 	s.Equal(Clubs, c.Suit(), "Expected suit to be Clubs")
 	c = Card{rank: two, suit: Diamonds}
@@ -234,7 +254,7 @@ func (s *KeyStreamSuite) TestCardSuit() {
 	c = Card{rank: jokerA}
 	s.Equal(suit(0), c.Suit(), "Expected suit to be 0 for Joker A")
 }
-func (s *KeyStreamSuite) TestCardRank() {
+func (s *CardTests) TestCardRank() {
 
 	testCases := []struct {
 		desc     string
@@ -280,7 +300,7 @@ func (s *KeyStreamSuite) TestCardRank() {
 	}
 
 }
-func (s *KeyStreamSuite) TestCardValue() {
+func (s *CardTests) TestCardValue() {
 	c := Card{rank: ace, suit: Clubs}
 	s.Equal(1, c.Value(), "Expected value to be 1 for Ace of Clubs")
 	c = Card{rank: two, suit: Diamonds}
@@ -295,7 +315,7 @@ func (s *KeyStreamSuite) TestCardValue() {
 	s.Equal(53, c.Value(), "Expected value to be 53 for Joker B")
 }
 
-func (s *KeyStreamSuite) TestCardString() {
+func (s *CardTests) TestCardString() {
 
 	testCases := []struct {
 		desc     string
@@ -341,6 +361,13 @@ func (s *KeyStreamSuite) TestCardString() {
 	}
 }
 
-func TestKeyStream(t *testing.T) {
-	suite.Run(t, new(KeyStreamSuite))
+func TestSuit(t *testing.T) {
+	suite.Run(t, new(SuitTests))
+}
+
+func TestRank(t *testing.T) {
+	suite.Run(t, new(RankTests))
+}
+func TestCard(t *testing.T) {
+	suite.Run(t, new(CardTests))
 }

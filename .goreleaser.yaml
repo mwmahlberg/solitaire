@@ -16,12 +16,21 @@ before:
     - go generate ./...
 
 builds:
-  - env:
+  - main: ./cmd
+    binary: solitaire
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
       - windows
       - darwin
+      - freebsd
+      - openbsd
+      # - android TODO: override cgo enabled for android
+    goarch:
+      - amd64
+      - arm64
+      
 
 archives:
   - formats: [tar.gz]
