@@ -19,9 +19,9 @@ package solitaire
 
 import "fmt"
 
-type rank int
+type Rank int
 
-func (r *rank) String() string {
+func (r *Rank) String() string {
 	switch *r {
 	case ace:
 		return "Ace"
@@ -54,7 +54,7 @@ func (r *rank) String() string {
 	}
 }
 
-func (r *rank) Short() string {
+func (r *Rank) Short() string {
 	switch *r {
 	case ace:
 		return "A"
@@ -73,7 +73,7 @@ const (
 	// TODO: Make this zero-based
 	// While it is more intuitive to have the first card be 1, it is not
 	// necessary for the algorithm.
-	ace rank = iota + 1
+	ace Rank = iota + 1
 	two
 	three
 	four
@@ -87,21 +87,21 @@ const (
 	queen
 	king
 
-	jokerA rank = 53
-	jokerB rank = 54
+	jokerA Rank = 53
+	jokerB Rank = 54
 )
 
-type suit int
+type Suit int
 
 const (
-	Clubs    suit = 0
-	Diamonds suit = 13
-	Hearts   suit = 26
-	Spades   suit = 39
+	Clubs    Suit = 0
+	Diamonds Suit = 13
+	Hearts   Suit = 26
+	Spades   Suit = 39
 )
 
-func (c suit) String() string {
-	switch c {
+func (s Suit) String() string {
+	switch s {
 	case Clubs:
 		return "♣"
 	case Diamonds:
@@ -120,19 +120,34 @@ func (c suit) String() string {
 	}
 }
 
-func (c suit) Value(rank int) int {
+func (s Suit) Short() string {
+	switch s {
+	case Clubs:
+		return "C"
+	case Diamonds:
+		return "D"
+	case Hearts:
+		return "H"
+	case Spades:
+		return "S"
+	default:
+		panic("invalid suit")
+	}
+}
+
+func (s Suit) Value(rank int) int {
 	if rank < 1 || rank > 13 {
 		panic("card must be between 1 and 13")
 	}
-	if (rank+int(c))%26 == 0 {
+	if (rank+int(s))%26 == 0 {
 		return 26
 	}
-	return (rank + int(c)) % 26
+	return (rank + int(s)) % 26
 }
 
 type Card struct {
-	suit suit
-	rank rank
+	suit Suit
+	rank Rank
 }
 
 func (c Card) IsJokerA() bool {
@@ -147,11 +162,11 @@ func (c Card) IsJoker() bool {
 	return c.IsJokerA() || c.IsJokerB()
 }
 
-func (c Card) Suit() suit {
+func (c Card) Suit() Suit {
 	return c.suit
 }
 
-func (c Card) Rank() rank {
+func (c Card) Rank() Rank {
 	return c.rank
 }
 
@@ -171,6 +186,17 @@ func (c Card) String() string {
 	}
 
 	return fmt.Sprintf("%s %s", c.suit.String(), c.rank.Short())
+}
+
+func (c Card) Short() string {
+	if c.IsJokerA() {
+		return "JA"
+	}
+	if c.IsJokerB() {
+		return "JB"
+	}
+
+	return fmt.Sprintf("%s%s", c.suit.Short(), c.rank.Short())
 }
 
 var initialDeck = []Card{

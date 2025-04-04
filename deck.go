@@ -1,35 +1,35 @@
-/* 
+/*
  *  Copyright 2025 Markus Mahlberg <138420+mwmahlberg@users.noreply.github.com>
- *  
+ *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
- *  
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *  
+ *
  */
 
 package solitaire
 
 type Deck [54]Card
 
-func (d *Deck) Advance() {
+func (d *Deck) advance() {
 	// Move the current position to the next card in the deck.
-	a := d.FindJokerA()
-	d.Move(a, 1)
-	b := d.FindJokerB()
-	d.Move(b, 2)
-	d.TripleCut()
-	d.CountCut()
+	a := d.findJokerA()
+	d.move(a, 1)
+	b := d.findJokerB()
+	d.move(b, 2)
+	d.tripleCut()
+	d.defaultCountCut()
 }
 
-func (d *Deck) Move(pos, by int) {
+func (d *Deck) move(pos, by int) {
 	// Move the card at the specified position by the specified number of positions
 	// in the deck.
 	offset := by
@@ -48,16 +48,16 @@ func (d *Deck) find(card Card) int {
 	}
 	return -1
 }
-func (d *Deck) FindJokerB() int {
+func (d *Deck) findJokerB() int {
 	// Find the index of the black joker in the deck.
 	return d.find(Card{rank: jokerB})
 }
 
-func (d *Deck) FindJokerA() int {
+func (d *Deck) findJokerA() int {
 	return d.find(Card{rank: jokerA})
 }
 
-func (d *Deck) FindFirstJoker() int {
+func (d *Deck) findFirstJoker() int {
 	// Find the index of the first joker in the deck.
 	for i, c := range d {
 		if c.rank == jokerB || c.rank == jokerA {
@@ -66,7 +66,7 @@ func (d *Deck) FindFirstJoker() int {
 	}
 	return -1
 }
-func (d *Deck) FindLastJoker() int {
+func (d *Deck) findLastJoker() int {
 	// Find the index of the last joker in the deck.
 	for i := len(d) - 1; i >= 0; i-- {
 		if d[i].rank == jokerA || d[i].rank == jokerB {
@@ -76,9 +76,9 @@ func (d *Deck) FindLastJoker() int {
 	return -1
 }
 
-func (d *Deck) TripleCut() {
-	f := d.FindFirstJoker()
-	l := d.FindLastJoker()
+func (d *Deck) tripleCut() {
+	f := d.findFirstJoker()
+	l := d.findLastJoker()
 
 	// TODO: This feels _wrong_.
 	// It should be manipulating the deck in place, not copying it.
@@ -89,7 +89,7 @@ func (d *Deck) TripleCut() {
 	copy(d[:], newOrder)
 }
 
-func (d *Deck) CountCut() {
+func (d *Deck) defaultCountCut() {
 	// Count the number of cards in the deck and cut the deck at that position.
 	// The number of cards is determined by the value of the card at the bottom of the deck.
 	bottomCard := d[len(d)-1]
@@ -112,7 +112,7 @@ func (d *Deck) countCut(cut int) {
 	copy(d[:], newOrder)
 }
 
-func (d *Deck) InsertCard(value Card, index int) {
+func (d *Deck) insertCard(value Card, index int) {
 	var n [54]Card
 	copy(n[:], d[:index])
 	copy(n[index:], []Card{value})
@@ -120,7 +120,7 @@ func (d *Deck) InsertCard(value Card, index int) {
 	copy(d[:], n[:])
 }
 
-func (d *Deck) RemoveCard(index int) {
+func (d *Deck) removeCard(index int) {
 	copy(d[:], d[:index])
 	copy(d[index:], d[index+1:])
 }
@@ -128,35 +128,17 @@ func (d *Deck) RemoveCard(index int) {
 func (d *Deck) moveCard(srcIndex int, dstIndex int) {
 	value := d[srcIndex]
 	// Remove the card from the source index
-	d.RemoveCard(srcIndex)
-	d.InsertCard(value, dstIndex)
+	d.removeCard(srcIndex)
+	d.insertCard(value, dstIndex)
 }
 
-func (d *Deck) Key() int {
-	d.Advance()
-	// The keystream is determined by the value of the card at the top of the deck.
-	// The value of the card is used to determine the index of the card in the deck.
-	// The card at that index is used to determine the keystream.
-	// The keystream is used to encrypt the plaintext.
-
+func (d *Deck) key() int {
+	d.advance()
+	// The key is determined by the value of the card at the top of the deck.
 	val := d[d[0].Value()].Value()
 	if val >= 53 {
 		// Skip the jokers
-		return 0
+		return d.key()
 	}
 	return val
-}
-
-func (d *Deck) generateKeyStream(length int) []int {
-	// Generate the keystream by moving the jokers and cutting the deck.
-	keys := make([]int, 0)
-	for i := 0; len(keys) < length; i++ {
-		val := d.Key()
-		if val == 0 {
-			// Skip the jokers
-			continue
-		}
-		keys = append(keys, val)
-	}
-	return keys
 }

@@ -15,32 +15,14 @@
  *
  */
 
-package main
+// Solitaire is an [encryption algorithm created by Bruce Schneier in 1999].
+// It is a simple algorithm that uses a deck of cards to generate a keystream.
+// The keystream is then combined with the plaintext to produce the ciphertext.
+//
+// This package provides an implementation of the Solitaire algorithm, to be used both as
+// a library and as a command line tool.
+//
+//
+// [encryption algorithm created by Bruce Schneier in 1999]: https://schneier.com/academic/solitaire
 
-import (
-	"fmt"
-
-	"github.com/awnumar/memguard"
-	"github.com/mwmahlberg/solitaire"
-)
-
-type decryptCmd struct {
-	Ciphertext []byte `kong:"arg,type='filecontent',help='Ciphertext to be decrypted',sep=''"` //nolint:golint
-}
-
-func (p *decryptCmd) Run() error {
-	s, err := solitaire.New(solitaire.WithPassphraseFromEnclave(cfg.Passphrase.enc))
-	if err != nil {
-		memguard.SafePanic(err)
-	}
-	ct, err := s.Decrypt(p.Ciphertext)
-	if err != nil {
-		memguard.SafePanic(err)
-	}
-	if ct == nil {
-		memguard.SafePanic("Plaintext is nil")
-	}
-	// Print the plaintext
-	fmt.Printf("%s\n", ct)
-	return nil
-}
+package solitaire

@@ -31,7 +31,7 @@ type SuitTests struct {
 func (s *SuitTests) TestSuitValue() {
 	testCases := []struct {
 		desc    string
-		suit    suit
+		suit    Suit
 		summand int
 	}{
 		{
@@ -73,7 +73,7 @@ func (s *SuitTests) TestSuitValue() {
 func (s *SuitTests) TestSuitString() {
 	testCases := []struct {
 		desc     string
-		suit     suit
+		suit     Suit
 		expected string
 	}{
 		{
@@ -117,7 +117,7 @@ func (s *SuitTests) TestSuitValueInvalid() {
 }
 
 func (s *SuitTests) TestSuitInvalid() {
-	var suitInvalidSuit = suit(100)
+	var suitInvalidSuit = Suit(100)
 	s.Panics(func() {
 		str := suitInvalidSuit.String()
 		s.Fail("Expected panic, but got: ", str)
@@ -131,7 +131,7 @@ type RankTests struct {
 func (s *RankTests) TestRankString() {
 	testCases := []struct {
 		desc     string
-		rank     rank
+		rank     Rank
 		expected string
 	}{
 		{
@@ -171,7 +171,7 @@ func (s *RankTests) TestRankString() {
 
 func (s *RankTests) TestRankStringNonFace() {
 	for i := 3; i <= 10; i++ {
-		r := rank(i)
+		r := Rank(i)
 		s.Run(r.String(), func() {
 			result := r.String()
 			s.Equal(fmt.Sprintf("%d", i), result)
@@ -180,7 +180,7 @@ func (s *RankTests) TestRankStringNonFace() {
 }
 
 func (s *RankTests) TestRankInvalid() {
-	var rankInvalidRank = rank(100)
+	var rankInvalidRank = Rank(100)
 	s.Panics(func() {
 		str := rankInvalidRank.String()
 		s.Fail("Expected panic, but got: ", str)
@@ -190,7 +190,7 @@ func (s *RankTests) TestRankInvalid() {
 func (s *RankTests) TestRankShort() {
 	testCases := []struct {
 		desc     string
-		rank     rank
+		rank     Rank
 		expected string
 	}{
 		{
@@ -230,7 +230,7 @@ func (s *RankTests) TestRankShort() {
 
 func (s *RankTests) TestRankShortNonFace() {
 	for i := 3; i <= 10; i++ {
-		r := rank(i)
+		r := Rank(i)
 		s.Run(r.String(), func() {
 			result := r.Short()
 			s.Equal(fmt.Sprintf("%d", i), result)
@@ -252,14 +252,14 @@ func (s *CardTests) TestCardSuit() {
 	c = Card{rank: king, suit: Spades}
 	s.Equal(Spades, c.Suit(), "Expected suit to be Spades")
 	c = Card{rank: jokerA}
-	s.Equal(suit(0), c.Suit(), "Expected suit to be 0 for Joker A")
+	s.Equal(Suit(0), c.Suit(), "Expected suit to be 0 for Joker A")
 }
 func (s *CardTests) TestCardRank() {
 
 	testCases := []struct {
 		desc     string
 		card     Card
-		expected rank
+		expected Rank
 	}{
 		{
 			desc:     "Ace of Clubs",

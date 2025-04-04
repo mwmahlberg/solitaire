@@ -45,7 +45,7 @@ func (t alphabet) Index(b byte) int {
 	return -1
 }
 
-func (t alphabet) Cchar(index int) byte {
+func (t alphabet) Char(index int) byte {
 	index = index % len(t)
 	if index == 0 {
 		index = len(t)
