@@ -93,7 +93,7 @@ func padClearText(plaintext []byte) []byte {
 	return padded
 }
 
-func BlocksOfFive(s []byte) []byte {
+func blocksOfFive(s []byte) []byte {
 
 	// This is a bit of a hack, but it works.
 	// Format the input with a space between every 5 characters
