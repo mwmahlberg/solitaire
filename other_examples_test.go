@@ -9,7 +9,8 @@ import (
 // This shows how to create a new solitaire instance without
 // a passphrase. This will use the default deck order to
 // generate the key stream.
-func Example_unkeyedDeck() {
+
+func Example() {
 	// Create a new solitaire instance without a passphrase for
 	// keying the deck. This will use the default deck order to
 	// generate the key stream. Only use this for tests!

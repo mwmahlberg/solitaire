@@ -30,10 +30,18 @@ import (
 // Errors returned by file systems can be tested against these errors
 // using errors.Is.
 var (
-	ErrNilBuffer         = fmt.Errorf("buffer is nil")
-	ErrBufferNotAlive    = fmt.Errorf("buffer is not alive")
-	ErrPassphraseIsNil   = fmt.Errorf("passphrase is required")
-	ErrInvalidPassphrase = fmt.Errorf("passphrase must not contain non-letter characters")
+	// returned when the [memguard.LockedBuffer] is nil
+	ErrNilBuffer = fmt.Errorf("buffer is nil")
+
+	// returned when the [memguard.LockedBuffer] is not alive
+	ErrBufferNotAlive = fmt.Errorf("buffer is not alive")
+
+	// returned when the passphrase is nil
+	// Note however that the passphrase may be empty.
+	ErrPassphraseIsNil = fmt.Errorf("passphrase is required")
+
+	// returned when the passphrase contains non-letter characters
+	ErrInvalidPassphrase = fmt.Errorf("passphrase contains non-letter characters")
 )
 
 var (
@@ -42,7 +50,7 @@ var (
 
 type Solitaire struct {
 	// The deck of cards used in the Solitaire encryption algorithm.
-	deck     *Deck
+	deck     *deck
 	alphabet alphabet
 }
 
@@ -74,7 +82,7 @@ func WithPassphrase(passphrase []byte) SolitaireOption {
 		if !uppercaseAscii.Match(passphrase) {
 			return ErrInvalidPassphrase
 		}
-		s.deck = &Deck{}
+		s.deck = &deck{}
 		copy(s.deck[:], initialDeck)
 
 		// Set the position to 0
@@ -136,7 +144,7 @@ func WithPassphraseFromEnclave(passphrase *memguard.Enclave) SolitaireOption {
 // If no options are provided, the default deck is used.
 func New(opts ...SolitaireOption) (*Solitaire, error) {
 	s := &Solitaire{
-		alphabet: DefaultAlphabet,
+		alphabet: defaultAlphabet,
 	}
 	for _, opt := range opts {
 		if err := opt(s); err != nil {
@@ -144,35 +152,49 @@ func New(opts ...SolitaireOption) (*Solitaire, error) {
 		}
 	}
 	if s.deck == nil {
-		s.deck = &Deck{}
+		s.deck = &deck{}
 		copy(s.deck[:], initialDeck)
 	}
 	return s, nil
 }
 
-// Deck returns a copy of the deck used by the [Solitaire] instance.
-// It is a convenience function to get the current state of the deck.
-// The deck is a slice of [Card] structs, which represent the cards in the deck.
-// A copy is returned to ensure that the used deck is not modified.
-func (s *Solitaire) Deck() []Card {
+// Deck returns the current state of the deck.
+// If export is true, the deck is returned in a format suitable for
+// import.
+func (s *Solitaire) Deck(export bool) []string {
 	// Return a copy of the deck
-	d := make([]Card, len(s.deck))
-	copy(d, s.deck[:])
+	d := make([]string, len(s.deck))
+	for i, c := range s.deck {
+		if export {
+			d[i] = c.Short()
+			continue
+		}
+		d[i] = c.String()
+	}
 	return d
+}
+
+func (s *Solitaire) SetDeck(d []string) error {
+	s.deck = new(deck)
+	if len(d) != 54 {
+		return fmt.Errorf("deck must be 54 cards, got %d", len(d))
+	}
+	var err error
+	for i, str := range d {
+		if s.deck[i], err = cardFromString(str); err != nil {
+			return fmt.Errorf("invalid card %s: %w", str, err)
+		}
+	}
+	return nil
 }
 
 // Encrypt encrypts the given plaintext using the Solitaire algorithm.
 // It takes a byte slice as input and returns a byte slice as output.
 //
-// First, the plaintext is normalized by removing spaces and converting all remaining
-// characters to uppercase their uppercase ASCII representation.
-// The result of the normalozation is padded with uppercase Xs to make its length the
-// customary a multiple of 5.
-// The keystream is generated using the current state of the deck.
-// Then, each plaintext character is encrypted with a corresponding keystream character.
-func (s *Solitaire) Encrypt(cleartext []byte) ([]byte, error) {
+
+func (s *Solitaire) Encrypt(plaintext []byte) ([]byte, error) {
 	// Normalize the plaintext by removing spaces and converting to uppercase.
-	normalized := padClearText(normalizeCleartext(cleartext))
+	normalized := padClearText(normalizeCleartext(plaintext))
 
 	// The character at that index is used to encrypt the plaintext.
 	ct := make([]byte, len(normalized))
@@ -183,11 +205,12 @@ func (s *Solitaire) Encrypt(cleartext []byte) ([]byte, error) {
 		ct[i] = s.alphabet.Char(idx)
 	}
 
-	return BlocksOfFive(ct), nil
+	return blocksOfFive(ct), nil
 }
 
 // Decrypt decrypts the given ciphertext using the Solitaire algorithm.
 // It takes the ciphertext as a byte slice and returns the cleartext as a byte slice.
+//
 // The ciphertext is normalized by removing all non-letter characters before decryption.
 func (s *Solitaire) Decrypt(ciphertext []byte) ([]byte, error) {
 	cleaned := nonLetters.ReplaceAll(ciphertext, []byte(""))
@@ -208,5 +231,5 @@ func (s *Solitaire) Decrypt(ciphertext []byte) ([]byte, error) {
 		}
 		ct[i] = s.alphabet.Char(idx)
 	}
-	return BlocksOfFive(ct), nil
+	return blocksOfFive(ct), nil
 }

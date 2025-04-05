@@ -26,7 +26,7 @@ type alphabet [26]byte
 // The alphabet is used to map the letters to numbers.
 // The mapping is as follows:
 // A = 1, B = 2, C = 3, ..., Z = 26
-var DefaultAlphabet = alphabet{
+var defaultAlphabet = alphabet{
 	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
 	'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
 	'U', 'V', 'W', 'X', 'Y', 'Z'}

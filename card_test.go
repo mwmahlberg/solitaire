@@ -28,72 +28,30 @@ type SuitTests struct {
 	suite.Suite
 }
 
-func (s *SuitTests) TestSuitValue() {
-	testCases := []struct {
-		desc    string
-		suit    Suit
-		summand int
-	}{
-		{
-			desc:    "Clubs",
-			suit:    Clubs,
-			summand: 0,
-		},
-		{
-			desc:    "Diamonds",
-			suit:    Diamonds,
-			summand: 13,
-		},
-		{
-			desc:    "Hearts",
-			suit:    Hearts,
-			summand: 26,
-		},
-		{
-			desc:    "Spades",
-			suit:    Spades,
-			summand: 39,
-		},
-	}
-
-	for _, tC := range testCases {
-		s.Run(tC.desc, func() {
-			for i := 1; i <= 13; i++ {
-				result := tC.suit.Value(i)
-				expected := (i + int(tC.suit)) % 26
-				if expected == 0 {
-					expected = 26
-				}
-				s.Equal(expected, result)
-			}
-		})
-	}
-}
-
 func (s *SuitTests) TestSuitString() {
 	testCases := []struct {
 		desc     string
-		suit     Suit
+		suit     suit
 		expected string
 	}{
 		{
 			desc:     "Clubs",
-			suit:     Clubs,
+			suit:     clubs,
 			expected: "♣",
 		},
 		{
 			desc:     "Diamonds",
-			suit:     Diamonds,
+			suit:     diamonds,
 			expected: "♦",
 		},
 		{
 			desc:     "Hearts",
-			suit:     Hearts,
+			suit:     hearts,
 			expected: "♥",
 		},
 		{
 			desc:     "Spades",
-			suit:     Spades,
+			suit:     spades,
 			expected: "♠",
 		},
 	}
@@ -107,17 +65,8 @@ func (s *SuitTests) TestSuitString() {
 
 }
 
-func (s *SuitTests) TestSuitValueInvalid() {
-	s.Panics(func() {
-		Clubs.Value(14)
-	})
-	s.Panics(func() {
-		Clubs.Value(-1)
-	})
-}
-
 func (s *SuitTests) TestSuitInvalid() {
-	var suitInvalidSuit = Suit(100)
+	var suitInvalidSuit = suit(100)
 	s.Panics(func() {
 		str := suitInvalidSuit.String()
 		s.Fail("Expected panic, but got: ", str)
@@ -131,7 +80,7 @@ type RankTests struct {
 func (s *RankTests) TestRankString() {
 	testCases := []struct {
 		desc     string
-		rank     Rank
+		rank     rank
 		expected string
 	}{
 		{
@@ -171,7 +120,7 @@ func (s *RankTests) TestRankString() {
 
 func (s *RankTests) TestRankStringNonFace() {
 	for i := 3; i <= 10; i++ {
-		r := Rank(i)
+		r := rank(i)
 		s.Run(r.String(), func() {
 			result := r.String()
 			s.Equal(fmt.Sprintf("%d", i), result)
@@ -180,7 +129,7 @@ func (s *RankTests) TestRankStringNonFace() {
 }
 
 func (s *RankTests) TestRankInvalid() {
-	var rankInvalidRank = Rank(100)
+	var rankInvalidRank = rank(100)
 	s.Panics(func() {
 		str := rankInvalidRank.String()
 		s.Fail("Expected panic, but got: ", str)
@@ -190,7 +139,7 @@ func (s *RankTests) TestRankInvalid() {
 func (s *RankTests) TestRankShort() {
 	testCases := []struct {
 		desc     string
-		rank     Rank
+		rank     rank
 		expected string
 	}{
 		{
@@ -230,7 +179,7 @@ func (s *RankTests) TestRankShort() {
 
 func (s *RankTests) TestRankShortNonFace() {
 	for i := 3; i <= 10; i++ {
-		r := Rank(i)
+		r := rank(i)
 		s.Run(r.String(), func() {
 			result := r.Short()
 			s.Equal(fmt.Sprintf("%d", i), result)
@@ -243,52 +192,52 @@ type CardTests struct {
 }
 
 func (s *CardTests) TestCardSuit() {
-	c := Card{rank: ace, suit: Clubs}
-	s.Equal(Clubs, c.Suit(), "Expected suit to be Clubs")
-	c = Card{rank: two, suit: Diamonds}
-	s.Equal(Diamonds, c.Suit(), "Expected suit to be Diamonds")
-	c = Card{rank: queen, suit: Hearts}
-	s.Equal(Hearts, c.Suit(), "Expected suit to be Hearts")
-	c = Card{rank: king, suit: Spades}
-	s.Equal(Spades, c.Suit(), "Expected suit to be Spades")
-	c = Card{rank: jokerA}
-	s.Equal(Suit(0), c.Suit(), "Expected suit to be 0 for Joker A")
+	c := card{rank: ace, suit: clubs}
+	s.Equal(clubs, c.Suit(), "Expected suit to be Clubs")
+	c = card{rank: two, suit: diamonds}
+	s.Equal(diamonds, c.Suit(), "Expected suit to be Diamonds")
+	c = card{rank: queen, suit: hearts}
+	s.Equal(hearts, c.Suit(), "Expected suit to be Hearts")
+	c = card{rank: king, suit: spades}
+	s.Equal(spades, c.Suit(), "Expected suit to be Spades")
+	c = card{rank: jokerA}
+	s.Equal(suit(0), c.Suit(), "Expected suit to be 0 for Joker A")
 }
 func (s *CardTests) TestCardRank() {
 
 	testCases := []struct {
 		desc     string
-		card     Card
-		expected Rank
+		card     card
+		expected rank
 	}{
 		{
 			desc:     "Ace of Clubs",
-			card:     Card{rank: ace, suit: Clubs},
+			card:     card{rank: ace, suit: clubs},
 			expected: ace,
 		},
 		{
 			desc:     "Two of Diamonds",
-			card:     Card{rank: two, suit: Diamonds},
+			card:     card{rank: two, suit: diamonds},
 			expected: two,
 		},
 		{
 			desc:     "Queen of Hearts",
-			card:     Card{rank: queen, suit: Hearts},
+			card:     card{rank: queen, suit: hearts},
 			expected: queen,
 		},
 		{
 			desc:     "King of Spades",
-			card:     Card{rank: king, suit: Spades},
+			card:     card{rank: king, suit: spades},
 			expected: king,
 		},
 		{
 			desc:     "Joker A",
-			card:     Card{rank: jokerA},
+			card:     card{rank: jokerA},
 			expected: jokerA,
 		},
 		{
 			desc:     "Joker B",
-			card:     Card{rank: jokerB},
+			card:     card{rank: jokerB},
 			expected: jokerB,
 		},
 	}
@@ -301,17 +250,17 @@ func (s *CardTests) TestCardRank() {
 
 }
 func (s *CardTests) TestCardValue() {
-	c := Card{rank: ace, suit: Clubs}
+	c := card{rank: ace, suit: clubs}
 	s.Equal(1, c.Value(), "Expected value to be 1 for Ace of Clubs")
-	c = Card{rank: two, suit: Diamonds}
+	c = card{rank: two, suit: diamonds}
 	s.Equal(15, c.Value(), "Expected value to be 2 for Two of Diamonds")
-	c = Card{rank: queen, suit: Hearts}
+	c = card{rank: queen, suit: hearts}
 	s.Equal(38, c.Value(), "Expected value to be 38 for Queen of Hearts")
-	c = Card{rank: king, suit: Spades}
+	c = card{rank: king, suit: spades}
 	s.Equal(52, c.Value(), "Expected value to be 52 for King of Spades")
-	c = Card{rank: jokerA, suit: 0}
+	c = card{rank: jokerA, suit: 0}
 	s.Equal(53, c.Value(), "Expected value to be 53 for Joker A")
-	c = Card{rank: jokerB, suit: 0}
+	c = card{rank: jokerB, suit: 0}
 	s.Equal(53, c.Value(), "Expected value to be 53 for Joker B")
 }
 
@@ -319,37 +268,37 @@ func (s *CardTests) TestCardString() {
 
 	testCases := []struct {
 		desc     string
-		card     Card
+		card     card
 		expected string
 	}{
 		{
 			desc:     "Ace of Clubs",
-			card:     Card{rank: ace, suit: Clubs},
+			card:     card{rank: ace, suit: clubs},
 			expected: "♣ A",
 		},
 		{
 			desc:     "Two of Diamonds",
-			card:     Card{rank: two, suit: Diamonds},
+			card:     card{rank: two, suit: diamonds},
 			expected: "♦ 2",
 		},
 		{
 			desc:     "Queen of Hearts",
-			card:     Card{rank: queen, suit: Hearts},
+			card:     card{rank: queen, suit: hearts},
 			expected: "♥ Q",
 		},
 		{
 			desc:     "King of Spades",
-			card:     Card{rank: king, suit: Spades},
+			card:     card{rank: king, suit: spades},
 			expected: "♠ K",
 		},
 		{
 			desc:     "Joker A",
-			card:     Card{rank: jokerA},
+			card:     card{rank: jokerA},
 			expected: "Joker A",
 		},
 		{
 			desc:     "Joker B",
-			card:     Card{rank: jokerB},
+			card:     card{rank: jokerB},
 			expected: "Joker B",
 		},
 	}

@@ -19,11 +19,34 @@ package solitaire_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/mwmahlberg/solitaire"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
+
+const (
+	setCRYPTONOMICON = "C7,C8,C9,D3,CQ,CK,DA,D2,SK,H4,D7,D8,D9,D10,DJ,DQ,DK,D4,C2,H5,H6,C5,H9,H10,HJ,HQ,H7,S2,S3,S4,S5,S6,S7,H8,SQ,JA,H2,S10,C6,D5,D6,HK,SA,S8,C10,CJ,HA,SJ,JB,H3,C3,C4,CA,S9"
+)
+
+type SolitaireTestSuite struct {
+	suite.Suite
+}
+
+func (s *SolitaireTestSuite) TestSetDeck() {
+	solitaire, err := solitaire.New()
+	s.NoError(err, "Failed to create new solitaire instance")
+	s.NotNil(solitaire, "Solitaire instance should not be nil")
+	err = solitaire.SetDeck(strings.Split(setCRYPTONOMICON, ","))
+	s.NoError(err, "Failed to set deck")
+	c, err := solitaire.Encrypt([]byte("SOLITAIRE"))
+	s.NoError(err, "Failed to encrypt plaintext")
+	s.NotNil(c, "Ciphertext should not be nil")
+	expected := "KIRAK SFJAN"
+	s.Equal(expected, string(c), "Ciphertext does not match expected value")
+}
 
 func TestEncryption(t *testing.T) {
 	testCases := []struct {

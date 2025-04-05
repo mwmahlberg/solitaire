@@ -17,9 +17,11 @@
 
 package solitaire
 
-type Deck [54]Card
+// A deck of cards used in the Solitaire algorithm.
+// The deck consists of 54 cards: 52 standard playing cards and 2 jokers.
+type deck [54]card
 
-func (d *Deck) advance() {
+func (d *deck) advance() {
 	// Move the current position to the next card in the deck.
 	a := d.findJokerA()
 	d.move(a, 1)
@@ -29,7 +31,7 @@ func (d *Deck) advance() {
 	d.defaultCountCut()
 }
 
-func (d *Deck) move(pos, by int) {
+func (d *deck) move(pos, by int) {
 	// Move the card at the specified position by the specified number of positions
 	// in the deck.
 	offset := by
@@ -39,7 +41,7 @@ func (d *Deck) move(pos, by int) {
 	d.moveCard(pos, (pos+offset)%len(d))
 }
 
-func (d *Deck) find(card Card) int {
+func (d *deck) find(card card) int {
 	// Find the index of the specified card in the deck.
 	for i, c := range d {
 		if c == card {
@@ -48,35 +50,34 @@ func (d *Deck) find(card Card) int {
 	}
 	return -1
 }
-func (d *Deck) findJokerB() int {
-	// Find the index of the black joker in the deck.
-	return d.find(Card{rank: jokerB})
+func (d *deck) findJokerA() int {
+	return d.find(card{rank: jokerA})
+}
+func (d *deck) findJokerB() int {
+	// Find the index of the fast joker in the deck.
+	return d.find(card{rank: jokerB})
 }
 
-func (d *Deck) findJokerA() int {
-	return d.find(Card{rank: jokerA})
-}
-
-func (d *Deck) findFirstJoker() int {
+func (d *deck) findFirstJoker() int {
 	// Find the index of the first joker in the deck.
 	for i, c := range d {
-		if c.rank == jokerB || c.rank == jokerA {
+		if c.IsJoker() {
 			return i
 		}
 	}
 	return -1
 }
-func (d *Deck) findLastJoker() int {
+func (d *deck) findLastJoker() int {
 	// Find the index of the last joker in the deck.
 	for i := len(d) - 1; i >= 0; i-- {
-		if d[i].rank == jokerA || d[i].rank == jokerB {
+		if d[i].IsJoker() {
 			return i
 		}
 	}
 	return -1
 }
 
-func (d *Deck) tripleCut() {
+func (d *deck) tripleCut() {
 	f := d.findFirstJoker()
 	l := d.findLastJoker()
 
@@ -89,7 +90,7 @@ func (d *Deck) tripleCut() {
 	copy(d[:], newOrder)
 }
 
-func (d *Deck) defaultCountCut() {
+func (d *deck) defaultCountCut() {
 	// Count the number of cards in the deck and cut the deck at that position.
 	// The number of cards is determined by the value of the card at the bottom of the deck.
 	bottomCard := d[len(d)-1]
@@ -97,7 +98,7 @@ func (d *Deck) defaultCountCut() {
 	d.countCut(cutPosition)
 }
 
-func (d *Deck) countCut(cut int) {
+func (d *deck) countCut(cut int) {
 	// Count the number of cards in the deck and cut the deck at that position.
 	// The number of cards is determined by the value of the card at the bottom of the deck.
 	if cut == 0 {
@@ -112,27 +113,27 @@ func (d *Deck) countCut(cut int) {
 	copy(d[:], newOrder)
 }
 
-func (d *Deck) insertCard(value Card, index int) {
-	var n [54]Card
+func (d *deck) insertCard(value card, index int) {
+	var n [54]card
 	copy(n[:], d[:index])
-	copy(n[index:], []Card{value})
+	copy(n[index:], []card{value})
 	copy(n[index+1:], d[index:])
 	copy(d[:], n[:])
 }
 
-func (d *Deck) removeCard(index int) {
+func (d *deck) removeCard(index int) {
 	copy(d[:], d[:index])
 	copy(d[index:], d[index+1:])
 }
 
-func (d *Deck) moveCard(srcIndex int, dstIndex int) {
+func (d *deck) moveCard(srcIndex int, dstIndex int) {
 	value := d[srcIndex]
 	// Remove the card from the source index
 	d.removeCard(srcIndex)
 	d.insertCard(value, dstIndex)
 }
 
-func (d *Deck) key() int {
+func (d *deck) key() int {
 	d.advance()
 	// The key is determined by the value of the card at the top of the deck.
 	val := d[d[0].Value()].Value()
