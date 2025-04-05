@@ -23,11 +23,11 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type EncryptionSuite struct {
+type HelperSuite struct {
 	suite.Suite
 }
 
-func (s *EncryptionSuite) TestNormalize() {
+func (s *HelperSuite) TestNormalize() {
 	testCases := []struct {
 		desc     string
 		input    []byte
@@ -65,7 +65,7 @@ func (s *EncryptionSuite) TestNormalize() {
 	}
 }
 
-func (s *EncryptionSuite) TestPadding() {
+func (s *HelperSuite) TestPadding() {
 	testCases := []struct {
 		desc     string
 		input    []byte
@@ -93,6 +93,6 @@ func (s *EncryptionSuite) TestPadding() {
 	}
 }
 
-func TestEncryptionSuite(t *testing.T) {
-	suite.Run(t, new(EncryptionSuite))
+func TestHelpers(t *testing.T) {
+	suite.Run(t, new(HelperSuite))
 }
