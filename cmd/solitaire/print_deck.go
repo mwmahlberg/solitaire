@@ -34,17 +34,12 @@ func (p *PrintDeck) Run() error {
 	if err != nil {
 		memguard.SafePanic(err)
 	}
+
+	sep := "\n"
 	if p.Export {
-		deck := make([]string, len(s.Deck()))
-		for i, c := range s.Deck() {
-			deck[i] = c.Short()
-		}
-		fmt.Println(strings.Join(deck, ","))
-		return nil
+		sep = ","
 	}
 
-	for i, c := range s.Deck() {
-		fmt.Printf("%2d: %s\n", i+1, c.String())
-	}
+	fmt.Printf("%s\n", strings.Join(s.Deck(p.Export), sep))
 	return nil
 }
